@@ -391,6 +391,527 @@ describe('GameData: schema and 15 level definitions verified', () => {
 });
 
 // =============================================================================
+// Task 3: Core Game Engine, State Machine & Web Audio Synthesizer
+// =============================================================================
+describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, Navigation)', () => {
+  const jsFilePath = path.join(SRC_DIR, 'JavaScript.html');
+  const gameDataPath = path.join(SRC_DIR, 'GameData.html');
+
+  // Helper to load GameData and JavaScript into a simulated DOM/Window environment
+  function loadGameModules() {
+    assert.ok(fs.existsSync(jsFilePath), 'src/JavaScript.html must exist');
+    const jsContent = fs.readFileSync(jsFilePath, 'utf8');
+    assert.ok(jsContent.trim().startsWith('<script'), 'src/JavaScript.html must start with <script>');
+    assert.ok(jsContent.trim().endsWith('</script>'), 'src/JavaScript.html must end with </script>');
+
+    const gameDataContent = fs.readFileSync(gameDataPath, 'utf8');
+    const rawDataJs = gameDataContent.replace(/<\/?script[^>]*>/gi, '');
+    const rawCodeJs = jsContent.replace(/<\/?script[^>]*>/gi, '');
+
+    // In-memory mock localStorage
+    const storageStore = {};
+    const mockLocalStorage = {
+      getItem: (key) => (Object.prototype.hasOwnProperty.call(storageStore, key) ? storageStore[key] : null),
+      setItem: (key, val) => { storageStore[key] = String(val); },
+      removeItem: (key) => { delete storageStore[key]; },
+      clear: () => { Object.keys(storageStore).forEach(k => delete storageStore[k]); }
+    };
+
+    // Minimal DOM element mock
+    function createMockElement(id = '', tag = 'div') {
+      const children = [];
+      const classListSet = new Set();
+      const attributes = {};
+      const el = {
+        id,
+        tagName: tag.toUpperCase(),
+        children,
+        parentElement: null,
+        innerHTML: '',
+        textContent: '',
+        style: {},
+        classList: {
+          add: (...classes) => classes.forEach(c => classListSet.add(c)),
+          remove: (...classes) => classes.forEach(c => classListSet.delete(c)),
+          contains: (c) => classListSet.has(c),
+          toggle: (c, force) => {
+            if (force === undefined) {
+              classListSet.has(c) ? classListSet.delete(c) : classListSet.add(c);
+            } else if (force) {
+              classListSet.add(c);
+            } else {
+              classListSet.delete(c);
+            }
+          }
+        },
+        setAttribute: (k, v) => { attributes[k] = String(v); },
+        getAttribute: (k) => attributes[k] || null,
+        appendChild: (child) => {
+          child.parentElement = el;
+          children.push(child);
+          return child;
+        },
+        closest: function(sel) {
+          if (sel.includes('[id]') && this.id) return this;
+          if (sel.includes('button') && this.tagName === 'BUTTON') return this;
+          if (sel.includes('[data-option-key]') && attributes['data-option-key']) return this;
+          if (sel.includes('[data-kingdom-index]') && attributes['data-kingdom-index']) return this;
+          if (this.parentElement) return this.parentElement.closest(sel);
+          return null;
+        },
+        querySelector: () => null,
+        querySelectorAll: () => []
+      };
+      return el;
+    }
+
+    const elementsMap = {};
+    ['screen-splash', 'screen-instructions', 'screen-main-map', 'screen-kingdom-gate',
+     'screen-challenge', 'screen-kingdom-reward', 'screen-final-victory',
+     'btn-start-adventure', 'btn-resume-adventure', 'btn-new-adventure',
+     'quiz-question', 'quiz-clue', 'quiz-animal-visual', 'quiz-options-container',
+     'quiz-minimap', 'modal-feedback', 'feedback-title', 'feedback-text',
+     'btn-feedback-continue', 'btn-feedback-retry', 'reward-title', 'reward-text',
+     'reward-crystal-visual', 'btn-reward-continue', 'victory-confetti'
+    ].forEach(id => {
+      elementsMap[id] = createMockElement(id);
+    });
+
+    const listeners = {};
+    const mockDocument = {
+      getElementById: (id) => {
+        if (!elementsMap[id]) {
+          elementsMap[id] = createMockElement(id);
+        }
+        return elementsMap[id];
+      },
+      querySelector: (sel) => {
+        if (sel.startsWith('#')) {
+          const id = sel.slice(1);
+          if (!elementsMap[id]) elementsMap[id] = createMockElement(id);
+          return elementsMap[id];
+        }
+        return null;
+      },
+      querySelectorAll: (sel) => {
+        if (sel.includes('.game-screen')) {
+          return [
+            elementsMap['screen-splash'],
+            elementsMap['screen-instructions'],
+            elementsMap['screen-main-map'],
+            elementsMap['screen-kingdom-gate'],
+            elementsMap['screen-challenge'],
+            elementsMap['screen-kingdom-reward'],
+            elementsMap['screen-final-victory']
+          ];
+        }
+        return [];
+      },
+      addEventListener: (evt, fn, capture) => {
+        listeners[evt] = listeners[evt] || [];
+        listeners[evt].push({ fn, capture });
+      },
+      dispatchEvent: (evt) => {
+        const list = listeners[evt.type] || [];
+        list.forEach(item => item.fn(evt));
+      },
+      createElement: (tag) => createMockElement('', tag)
+    };
+
+    const mockWindow = {
+      localStorage: mockLocalStorage,
+      document: mockDocument,
+      AudioContext: undefined,
+      webkitAudioContext: undefined
+    };
+
+    const sandbox = {
+      window: mockWindow,
+      document: mockDocument,
+      localStorage: mockLocalStorage,
+      module: { exports: {} },
+      exports: {},
+      console
+    };
+
+    // Run GameData first
+    const runGameData = new Function('window', 'document', 'module', 'exports', rawDataJs);
+    runGameData(mockWindow, mockDocument, sandbox.module, sandbox.exports);
+    mockWindow.GAME_DATA = sandbox.module.exports.kingdoms ? sandbox.module.exports : mockWindow.GAME_DATA;
+
+    // Run JavaScript
+    const jsModule = { exports: {} };
+    const runJs = new Function('window', 'document', 'localStorage', 'module', 'exports', rawCodeJs);
+    runJs(mockWindow, mockDocument, mockLocalStorage, jsModule, jsModule.exports);
+
+    return {
+      window: mockWindow,
+      document: mockDocument,
+      localStorage: mockLocalStorage,
+      GAME_DATA: mockWindow.GAME_DATA,
+      GameEngine: jsModule.exports.GameEngine || mockWindow.GameEngine,
+      SoundEffects: jsModule.exports.SoundEffects || mockWindow.SoundEffects,
+      MiniMapComponent: jsModule.exports.MiniMapComponent || mockWindow.MiniMapComponent,
+      QuizController: jsModule.exports.QuizController || mockWindow.QuizController,
+      RewardController: jsModule.exports.RewardController || mockWindow.RewardController,
+      VictoryController: jsModule.exports.VictoryController || mockWindow.VictoryController,
+      NavigationRouter: jsModule.exports.NavigationRouter || mockWindow.NavigationRouter
+    };
+  }
+
+  it('src/JavaScript.html exists and exports all required classes/objects', () => {
+    const modules = loadGameModules();
+    assert.ok(modules.GameEngine, 'GameEngine must be exported');
+    assert.ok(modules.SoundEffects, 'SoundEffects must be exported');
+    assert.ok(modules.MiniMapComponent, 'MiniMapComponent must be exported');
+    assert.ok(modules.QuizController, 'QuizController must be exported');
+    assert.ok(modules.RewardController, 'RewardController must be exported');
+    assert.ok(modules.VictoryController, 'VictoryController must be exported');
+    assert.ok(modules.NavigationRouter, 'NavigationRouter must be exported');
+  });
+
+  it('GameEngine: strict state machine implements Table J2 checkpoints progression', () => {
+    const { GameEngine, GAME_DATA } = loadGameModules();
+    const engine = new GameEngine(GAME_DATA);
+
+    // Initial state: Level 1 (index 0) of Karnivora (index 0)
+    assert.strictEqual(engine.currentKingdomIndex, 0, 'Initial kingdom must be 0 (Karnivora)');
+    assert.strictEqual(engine.currentLevelIndex, 0, 'Initial level must be 0');
+    assert.strictEqual(engine.getKingdomProgressCount(0), 0, 'Kingdom 0 initial progress must be 0/5');
+    assert.strictEqual(engine.isKingdomUnlocked(0), true, 'Kingdom 0 must be unlocked initially');
+    assert.strictEqual(engine.isKingdomUnlocked(1), false, 'Kingdom 1 must be locked initially');
+    assert.strictEqual(engine.isKingdomUnlocked(2), false, 'Kingdom 2 must be locked initially');
+
+    // Checkpoint 0 active, 1..4 locked
+    assert.strictEqual(engine.getCheckpointStatus(0), 'active', 'Level 0 must be active');
+    for (let i = 1; i < 5; i++) {
+      assert.strictEqual(engine.getCheckpointStatus(i), 'locked', `Level ${i} must be locked at start`);
+    }
+
+    // Question 1: Singa (Answer B)
+    // Wrong answer 'A' must NOT advance level
+    const wrongVal = engine.validateAnswer('A');
+    assert.strictEqual(wrongVal.isCorrect, false, 'Option A is incorrect for Singa');
+    assert.strictEqual(engine.currentLevelIndex, 0, 'Level must NOT advance on wrong answer');
+    assert.strictEqual(engine.getCheckpointStatus(0), 'active');
+
+    // Correct answer 'B' validates true, but does NOT advance level until advanceLevel() is called
+    const correctVal = engine.validateAnswer('B');
+    assert.strictEqual(correctVal.isCorrect, true, 'Option B is correct for Singa');
+    assert.strictEqual(engine.currentLevelIndex, 0, 'Level must NOT advance before advanceLevel()');
+
+    // Now call advanceLevel()
+    engine.advanceLevel();
+    assert.strictEqual(engine.currentLevelIndex, 1, 'Level must advance to 1');
+    assert.strictEqual(engine.getKingdomProgressCount(0), 1, 'Progress should be 1/5');
+    assert.strictEqual(engine.getCheckpointStatus(0), 'completed', 'Checkpoint 0 should now be completed');
+    assert.strictEqual(engine.getCheckpointStatus(1), 'active', 'Checkpoint 1 should now be active');
+    for (let i = 2; i < 5; i++) {
+      assert.strictEqual(engine.getCheckpointStatus(i), 'locked', `Checkpoint ${i} must still be locked`);
+    }
+
+    // Step through level 2 (Harimau: A), 3 (Buaya: B), 4 (Serigala: C)
+    engine.advanceLevel(); // To level 2
+    assert.strictEqual(engine.currentLevelIndex, 2);
+    assert.strictEqual(engine.getKingdomProgressCount(0), 2);
+    assert.strictEqual(engine.getCheckpointStatus(0), 'completed');
+    assert.strictEqual(engine.getCheckpointStatus(1), 'completed');
+    assert.strictEqual(engine.getCheckpointStatus(2), 'active');
+
+    engine.advanceLevel(); // To level 3
+    assert.strictEqual(engine.currentLevelIndex, 3);
+    assert.strictEqual(engine.getKingdomProgressCount(0), 3);
+    assert.strictEqual(engine.getCheckpointStatus(2), 'completed');
+    assert.strictEqual(engine.getCheckpointStatus(3), 'active');
+
+    engine.advanceLevel(); // To level 4 (Level 5 in game, Hiu)
+    assert.strictEqual(engine.currentLevelIndex, 4);
+    assert.strictEqual(engine.getKingdomProgressCount(0), 4);
+    assert.strictEqual(engine.getCheckpointStatus(3), 'completed');
+    assert.strictEqual(engine.getCheckpointStatus(4), 'active');
+
+    // Complete Level 5
+    const res = engine.advanceLevel();
+    assert.strictEqual(engine.currentLevelIndex, 5, 'Level index becomes 5 upon kingdom completion');
+    assert.strictEqual(engine.getKingdomProgressCount(0), 5, 'Progress is 5/5');
+    assert.strictEqual(res.kingdomCompleted, true, 'advanceLevel returns kingdomCompleted true');
+    assert.strictEqual(res.crystal, 'kristal_keberanian', 'Awards Kristal Keberanian');
+
+    // When kingdom completed, all 5 checkpoints are completed
+    for (let i = 0; i < 5; i++) {
+      assert.strictEqual(engine.getCheckpointStatus(i), 'completed', `Checkpoint ${i} must be completed at 5/5`);
+    }
+
+    // Kingdom 1 (Herbivora) is now unlocked!
+    assert.strictEqual(engine.isKingdomUnlocked(1), true, 'Herbivora must unlock after Karnivora is 5/5');
+    assert.strictEqual(engine.isKingdomUnlocked(2), false, 'Omnivora must still be locked');
+  });
+
+  it('GameEngine: Option A shared device persistence with localStorage', () => {
+    const { GameEngine, GAME_DATA, localStorage } = loadGameModules();
+    const engine1 = new GameEngine(GAME_DATA);
+
+    // Initial hasSavedProgress should be false
+    assert.strictEqual(engine1.hasSavedProgress(), false, 'hasSavedProgress must be false initially');
+
+    // Advance 2 levels and save
+    engine1.advanceLevel();
+    engine1.advanceLevel();
+    engine1.saveProgress();
+
+    assert.strictEqual(engine1.hasSavedProgress(), true, 'hasSavedProgress must be true after saving');
+    assert.ok(localStorage.getItem('mini_zoo_progress_v2'), 'localStorage must have mini_zoo_progress_v2');
+
+    // Create new engine instance and load progress
+    const engine2 = new GameEngine(GAME_DATA);
+    const loaded = engine2.loadProgress();
+    assert.strictEqual(loaded, true, 'loadProgress must return true when data exists');
+    assert.strictEqual(engine2.currentKingdomIndex, 0);
+    assert.strictEqual(engine2.currentLevelIndex, 2);
+    assert.strictEqual(engine2.getKingdomProgressCount(0), 2);
+
+    // Reset progress
+    engine2.resetProgress();
+    assert.strictEqual(engine2.currentKingdomIndex, 0);
+    assert.strictEqual(engine2.currentLevelIndex, 0);
+    assert.strictEqual(engine2.hasSavedProgress(), false, 'hasSavedProgress must be false after reset');
+    assert.strictEqual(localStorage.getItem('mini_zoo_progress_v2'), null, 'localStorage item must be removed');
+  });
+
+  it('SoundEffects: safely synthesizes audio and supports mute toggle', () => {
+    const { SoundEffects } = loadGameModules();
+    const sfx = new SoundEffects();
+
+    assert.strictEqual(typeof sfx.init, 'function');
+    assert.strictEqual(typeof sfx.play, 'function');
+    assert.strictEqual(typeof sfx.toggleMute, 'function');
+
+    // Should not throw even when Web Audio API is absent/headless
+    sfx.init();
+    ['click', 'correct', 'wrong', 'crystal', 'fanfare'].forEach(name => {
+      assert.doesNotThrow(() => sfx.play(name), `play('${name}') should not throw`);
+    });
+
+    assert.strictEqual(sfx.isMuted(), false, 'Initially not muted');
+    const mutedState = sfx.toggleMute();
+    assert.strictEqual(mutedState, true, 'toggleMute should return true (muted)');
+    assert.strictEqual(sfx.isMuted(), true);
+
+    // Playing while muted should no-op safely
+    assert.doesNotThrow(() => sfx.play('correct'));
+
+    sfx.toggleMute();
+    assert.strictEqual(sfx.isMuted(), false);
+  });
+
+  it('MiniMapComponent: renders 5-step horizontal progression line according to Table J2', () => {
+    const { MiniMapComponent } = loadGameModules();
+    assert.strictEqual(typeof MiniMapComponent.render, 'function');
+
+    // At Level 1 (currentLevelIdx = 0): Step 1 is active, steps 2-5 are locked
+    const html0 = MiniMapComponent.render(null, 0, 0);
+    assert.ok(typeof html0 === 'string', 'render should return HTML string');
+    assert.ok(html0.includes('0/5') || html0.includes('Checkpoint'), 'Should show progress count');
+    assert.ok(html0.includes('active') || html0.includes('gold'), 'Must render active checkpoint');
+
+    // At Level 3 (currentLevelIdx = 2): Steps 1-2 completed, step 3 active, 4-5 locked
+    const html2 = MiniMapComponent.render(null, 0, 2);
+    assert.ok(html2.includes('completed') || html2.includes('check'), 'Must render completed checkpoint');
+
+    // At Kingdom completed (currentLevelIdx = 5): All completed
+    const html5 = MiniMapComponent.render(null, 0, 5);
+    assert.ok(html5.includes('5/5'), 'Must render 5/5 completed');
+  });
+
+  it('NavigationRouter: bulletproof event capture and screen switching', () => {
+    const modules = loadGameModules();
+    const { NavigationRouter, GameEngine, SoundEffects, GAME_DATA, window } = modules;
+    const engine = new GameEngine(GAME_DATA);
+    const sfx = new SoundEffects();
+    const router = new NavigationRouter({ engine, sfx });
+
+    assert.strictEqual(typeof router.navigateTo, 'function');
+    assert.strictEqual(typeof router.openKingdomGate, 'function');
+
+    // Check screen navigation
+    router.navigateTo('screen-instructions');
+    assert.strictEqual(router.getCurrentScreen(), 'screen-instructions');
+
+    router.navigateTo('screen-main-map');
+    assert.strictEqual(router.getCurrentScreen(), 'screen-main-map');
+
+    // Global window bindings
+    assert.strictEqual(typeof window.navigateTo, 'function');
+    assert.strictEqual(typeof window.openKingdomGate, 'function');
+    assert.strictEqual(typeof window.toggleSound, 'function');
+  });
+
+  it('GameEngine: full 15-level game progression across all 3 kingdoms with crystal rewards', () => {
+    const { GameEngine, GAME_DATA } = loadGameModules();
+    const engine = new GameEngine(GAME_DATA);
+
+    // Kerajaan 1: Karnivora (5 animals: singa, harimau, buaya, serigala, hiu)
+    assert.strictEqual(engine.currentKingdomIndex, 0);
+    assert.strictEqual(engine.isKingdomUnlocked(0), true);
+    assert.strictEqual(engine.isKingdomUnlocked(1), false);
+    assert.strictEqual(engine.isKingdomUnlocked(2), false);
+
+    const k1Answers = ['B', 'A', 'B', 'C', 'B'];
+    for (let i = 0; i < 5; i++) {
+      assert.strictEqual(engine.currentLevelIndex, i);
+      const val = engine.validateAnswer(k1Answers[i]);
+      assert.strictEqual(val.isCorrect, true, `Kingdom 1 Level ${i + 1} answer must be correct`);
+      engine.advanceLevel();
+    }
+    assert.strictEqual(engine.currentLevelIndex, 5);
+    assert.strictEqual(engine.getKingdomProgressCount(0), 5);
+    assert.ok(engine.collectedCrystals.includes('kristal_keberanian'), 'Must award Kristal Keberanian');
+    assert.strictEqual(engine.isKingdomUnlocked(1), true, 'Herbivora must now be unlocked');
+    assert.strictEqual(engine.isKingdomUnlocked(2), false, 'Omnivora must still be locked');
+
+    // Kerajaan 2: Herbivora (5 animals: sapi, kelinci, jerapah, gajah, rusa)
+    assert.strictEqual(engine.setKingdom(1), true);
+    assert.strictEqual(engine.currentKingdomIndex, 1);
+    assert.strictEqual(engine.currentLevelIndex, 0);
+
+    const k2Answers = ['B', 'A', 'B', 'B', 'B'];
+    for (let i = 0; i < 5; i++) {
+      assert.strictEqual(engine.currentLevelIndex, i);
+      const val = engine.validateAnswer(k2Answers[i]);
+      assert.strictEqual(val.isCorrect, true, `Kingdom 2 Level ${i + 1} answer must be correct`);
+      engine.advanceLevel();
+    }
+    assert.strictEqual(engine.currentLevelIndex, 5);
+    assert.strictEqual(engine.getKingdomProgressCount(1), 5);
+    assert.ok(engine.collectedCrystals.includes('kristal_kehidupan'), 'Must award Kristal Kehidupan');
+    assert.strictEqual(engine.isKingdomUnlocked(2), true, 'Omnivora must now be unlocked');
+
+    // Kerajaan 3: Omnivora (5 animals: beruang, ayam, babi, monyet, gagak)
+    assert.strictEqual(engine.setKingdom(2), true);
+    assert.strictEqual(engine.currentKingdomIndex, 2);
+    assert.strictEqual(engine.currentLevelIndex, 0);
+
+    const k3Answers = ['A', 'B', 'C', 'A', 'B'];
+    for (let i = 0; i < 4; i++) {
+      const val = engine.validateAnswer(k3Answers[i]);
+      assert.strictEqual(val.isCorrect, true);
+      const adv = engine.advanceLevel();
+      assert.strictEqual(adv.allCompleted, false);
+    }
+
+    // Final 15th level: Gagak
+    const finalVal = engine.validateAnswer(k3Answers[4]);
+    assert.strictEqual(finalVal.isCorrect, true);
+    const finalAdv = engine.advanceLevel();
+    assert.strictEqual(finalAdv.kingdomCompleted, true);
+    assert.strictEqual(finalAdv.allCompleted, true, 'Game must be marked allCompleted upon finishing level 15');
+    assert.ok(engine.collectedCrystals.includes('kristal_harmoni'), 'Must award Kristal Harmoni');
+    assert.strictEqual(engine.collectedCrystals.length, 3, 'Must have collected all 3 crystals');
+  });
+
+  it('QuizController: challenge loading, option validation, feedback modal, and continuation flow', () => {
+    const modules = loadGameModules();
+    const { QuizController, GameEngine, SoundEffects, NavigationRouter, GAME_DATA, document } = modules;
+    const engine = new GameEngine(GAME_DATA);
+    const sfx = new SoundEffects();
+    const router = new NavigationRouter({ engine, sfx });
+    const quiz = new QuizController(engine, sfx, router);
+    router.quizController = quiz;
+
+    // Load initial challenge (Level 1: Singa)
+    quiz.loadCurrentChallenge();
+
+    assert.strictEqual(document.getElementById('quiz-question').textContent, 'Siapakah aku?');
+    assert.ok(document.getElementById('quiz-clue').textContent.includes('surai lebat'), 'Clue must mention surai lebat');
+    assert.ok(document.getElementById('quiz-level-indicator').textContent.includes('1 dari 5'));
+    assert.ok(document.getElementById('quiz-options-container').innerHTML.includes('Singa'));
+
+    // Wrong answer 'A' (Harimau)
+    quiz.handleOptionSelect('A');
+    assert.strictEqual(quiz.isModalOpen, true);
+    assert.strictEqual(document.getElementById('feedback-text').textContent, 'Jawabanmu belum tepat. Ayo coba lagi!');
+    assert.strictEqual(document.getElementById('btn-feedback-retry').style.display, 'inline-flex');
+    assert.strictEqual(document.getElementById('btn-feedback-continue').style.display, 'none');
+    assert.strictEqual(engine.currentLevelIndex, 0, 'Level must not change on wrong answer');
+
+    // Retry closes modal
+    quiz.closeFeedbackModal();
+    assert.strictEqual(quiz.isModalOpen, false);
+    assert.strictEqual(document.getElementById('modal-feedback').style.display, 'none');
+
+    // Correct answer 'B' (Singa)
+    quiz.handleOptionSelect('B');
+    assert.strictEqual(quiz.isModalOpen, true);
+    assert.ok(document.getElementById('feedback-text').textContent.includes('Aku adalah singa'), 'Must show verbatim educational text');
+    assert.strictEqual(document.getElementById('btn-feedback-continue').style.display, 'inline-flex');
+    assert.strictEqual(document.getElementById('btn-feedback-retry').style.display, 'none');
+    assert.strictEqual(engine.currentLevelIndex, 0, 'Level must still be 0 before continue is clicked');
+
+    // Click LANJUTKAN via handleContinue
+    quiz.handleContinue();
+    assert.strictEqual(quiz.isModalOpen, false);
+    assert.strictEqual(engine.currentLevelIndex, 1, 'Level must now be 1 (Harimau)');
+    assert.ok(document.getElementById('quiz-clue').textContent.includes('belang hitam dan oranye'), 'Clue must now be Harimau');
+    assert.ok(document.getElementById('quiz-level-indicator').textContent.includes('2 dari 5'));
+  });
+
+  it('RewardController and VictoryController display verbatim titles, crystals, and conferred title', () => {
+    const modules = loadGameModules();
+    const { RewardController, VictoryController, GameEngine, SoundEffects, NavigationRouter, GAME_DATA, document } = modules;
+    const engine = new GameEngine(GAME_DATA);
+    const sfx = new SoundEffects();
+    const router = new NavigationRouter({ engine, sfx });
+    const reward = new RewardController(engine, sfx, router);
+    const victory = new VictoryController(engine, sfx, router);
+
+    // Test Reward screen for Karnivora
+    reward.showKingdomReward(0);
+    assert.ok(document.getElementById('reward-title').textContent.includes('Kerajaan Karnivora'));
+    assert.strictEqual(document.getElementById('reward-crystal-name').textContent, 'Kristal Keberanian × 1');
+    assert.ok(document.getElementById('reward-crystal-visual').innerHTML.includes('<svg'));
+
+    // Test Final Victory Screen
+    victory.showFinalVictory();
+    assert.ok(document.getElementById('victory-title').textContent.includes('SELAMAT!'));
+    assert.strictEqual(document.getElementById('victory-grand-title').textContent, 'PENJAGA PENGETAHUAN SATWA MINI ZOO!');
+    assert.ok(document.getElementById('victory-survivor-visual').innerHTML.includes('<svg'));
+    assert.ok(document.getElementById('victory-crystals-container').innerHTML.includes('Kristal Keberanian'));
+    assert.ok(document.getElementById('victory-crystals-container').innerHTML.includes('Kristal Kehidupan'));
+    assert.ok(document.getElementById('victory-crystals-container').innerHTML.includes('Kristal Harmoni'));
+  });
+
+  it('NavigationRouter: delegates capture clicks on deeply nested button children reliably', () => {
+    const modules = loadGameModules();
+    const { NavigationRouter, GameEngine, SoundEffects, GAME_DATA, document } = modules;
+    const engine = new GameEngine(GAME_DATA);
+    const sfx = new SoundEffects();
+    const router = new NavigationRouter({ engine, sfx });
+
+    router.navigateTo('screen-splash');
+    assert.strictEqual(router.getCurrentScreen(), 'screen-splash');
+
+    // Create a button with nested span child: <button id="btn-start-adventure"><span>Mulai</span></button>
+    const btn = document.getElementById('btn-start-adventure');
+    btn.tagName = 'BUTTON';
+    const innerSpan = document.createElement('span');
+    innerSpan.textContent = 'Mulai Petualangan';
+    btn.appendChild(innerSpan);
+
+    // Click on inner span, verify delegation resolves to #btn-start-adventure and navigates to instructions
+    document.dispatchEvent({ type: 'click', target: innerSpan });
+    assert.strictEqual(router.getCurrentScreen(), 'screen-instructions', 'Click on inner span must navigate to screen-instructions');
+
+    // From instructions, click #btn-start-mission
+    const btnMission = document.getElementById('btn-start-mission');
+    btnMission.tagName = 'BUTTON';
+    const missionIcon = document.createElement('svg');
+    btnMission.appendChild(missionIcon);
+    document.dispatchEvent({ type: 'click', target: missionIcon });
+    assert.strictEqual(router.getCurrentScreen(), 'screen-main-map', 'Click on inner icon of mission button must navigate to screen-main-map');
+  });
+});
+
+// =============================================================================
 // Test Runner Summary & Exit Code
 // =============================================================================
 console.log('\n========================================');

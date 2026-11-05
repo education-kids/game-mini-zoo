@@ -1,0 +1,1149 @@
+<script>
+/**
+ * Petualangan Mini Zoo - Core Game Engine, State Machine, Web Audio & Navigation Router
+ * Target Audience: Siswa Kelas 4 Sekolah Dasar
+ * Table J2 State Machine & Option A Shared Device Persistence
+ * Bulletproof Event Capture Delegation for Google Apps Script Sandboxed Iframes
+ */
+
+(function (global) {
+  'use strict';
+
+  // ===========================================================================
+  // 1. GAME ENGINE & STATE MACHINE (Table J2 & Option A Session Management)
+  // ===========================================================================
+  class GameEngine {
+    constructor(gameData) {
+      this.STORAGE_KEY = 'mini_zoo_progress_v2';
+      this.gameData = gameData || (typeof window !== 'undefined' ? window.GAME_DATA : null);
+
+      this.currentKingdomIndex = 0; // 0: Karnivora, 1: Herbivora, 2: Omnivora
+      this.currentLevelIndex = 0;   // 0..4: Level 1..5 in kingdom, 5: kingdom completed
+      this.kingdomLevels = [0, 0, 0];
+      this.collectedCrystals = [];
+    }
+
+    getCurrentKingdom() {
+      if (!this.gameData || !this.gameData.kingdoms) return null;
+      return this.gameData.kingdoms[this.currentKingdomIndex] || null;
+    }
+
+    getCurrentLevelData() {
+      if (!this.gameData || !this.gameData.levels) return null;
+      const kingdom = this.getCurrentKingdom();
+      if (!kingdom) return null;
+      const targetKingdomLevel = Math.min(5, this.currentLevelIndex + 1);
+      return this.gameData.levels.find(
+        lvl => lvl.kingdomId === kingdom.id && lvl.kingdomLevel === targetKingdomLevel
+      ) || null;
+    }
+
+    getKingdomProgressCount(kingdomIdx) {
+      if (kingdomIdx < 0 || kingdomIdx > 2) return 0;
+      return Math.min(5, Math.max(0, this.kingdomLevels[kingdomIdx] || 0));
+    }
+
+    isKingdomUnlocked(kingdomIdx) {
+      if (kingdomIdx === 0) return true;
+      if (kingdomIdx === 1) return this.getKingdomProgressCount(0) >= 5;
+      if (kingdomIdx === 2) return this.getKingdomProgressCount(1) >= 5;
+      return false;
+    }
+
+    getCheckpointStatus(levelIdx) {
+      // Table J2 strict checkpoint rules
+      if (this.currentLevelIndex >= 5) {
+        return 'completed';
+      }
+      if (levelIdx < this.currentLevelIndex) {
+        return 'completed';
+      }
+      if (levelIdx === this.currentLevelIndex) {
+        return 'active';
+      }
+      return 'locked';
+    }
+
+    validateAnswer(optionKey) {
+      const level = this.getCurrentLevelData();
+      if (!level) {
+        return { isCorrect: false, feedback: '', animal: null, answer: '' };
+      }
+      const normalizedKey = String(optionKey || '').trim().toUpperCase();
+      const isCorrect = normalizedKey === level.answer.toUpperCase();
+      // Crucial requirement: Correct answer validates true, but does NOT advance level yet!
+      return {
+        isCorrect,
+        feedback: level.feedback,
+        answer: level.answer,
+        animal: level
+      };
+    }
+
+    advanceLevel() {
+      if (this.currentLevelIndex < 5) {
+        this.currentLevelIndex++;
+        this.kingdomLevels[this.currentKingdomIndex] = this.currentLevelIndex;
+      }
+
+      let kingdomCompleted = false;
+      let crystalAwarded = null;
+      let allCompleted = false;
+
+      if (this.currentLevelIndex >= 5) {
+        kingdomCompleted = true;
+        const kingdom = this.getCurrentKingdom();
+        if (kingdom && kingdom.crystalId) {
+          crystalAwarded = kingdom.crystalId;
+          if (!this.collectedCrystals.includes(crystalAwarded)) {
+            this.collectedCrystals.push(crystalAwarded);
+          }
+        }
+        if (this.currentKingdomIndex === 2 && this.currentLevelIndex >= 5) {
+          allCompleted = true;
+        }
+      }
+
+      this.saveProgress();
+
+      return {
+        kingdomCompleted,
+        crystal: crystalAwarded,
+        allCompleted,
+        currentLevelIndex: this.currentLevelIndex
+      };
+    }
+
+    advanceKingdom() {
+      if (this.currentKingdomIndex < 2) {
+        this.currentKingdomIndex++;
+        this.currentLevelIndex = this.kingdomLevels[this.currentKingdomIndex] || 0;
+        this.saveProgress();
+        return true;
+      }
+      return false;
+    }
+
+    setKingdom(kingdomIdx) {
+      if (this.isKingdomUnlocked(kingdomIdx)) {
+        this.currentKingdomIndex = kingdomIdx;
+        this.currentLevelIndex = this.kingdomLevels[kingdomIdx] || 0;
+        this.saveProgress();
+        return true;
+      }
+      return false;
+    }
+
+    hasSavedProgress() {
+      try {
+        const storage = (typeof window !== 'undefined' && window.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+        if (!storage) return false;
+        const raw = storage.getItem(this.STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== 'object') return false;
+        const hasKingdomProgress = typeof data.currentKingdomIndex === 'number' && data.currentKingdomIndex > 0;
+        const hasLevelProgress = typeof data.currentLevelIndex === 'number' && data.currentLevelIndex > 0;
+        const hasLevelsArray = Array.isArray(data.kingdomLevels) && data.kingdomLevels.some(l => l > 0);
+        const hasCrystals = Array.isArray(data.collectedCrystals) && data.collectedCrystals.length > 0;
+        return Boolean(hasKingdomProgress || hasLevelProgress || hasLevelsArray || hasCrystals);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    saveProgress() {
+      try {
+        const storage = (typeof window !== 'undefined' && window.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+        if (!storage) return;
+        const payload = {
+          currentKingdomIndex: this.currentKingdomIndex,
+          currentLevelIndex: this.currentLevelIndex,
+          kingdomLevels: this.kingdomLevels,
+          collectedCrystals: this.collectedCrystals,
+          timestamp: Date.now()
+        };
+        storage.setItem(this.STORAGE_KEY, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('Unable to persist game progress:', e);
+      }
+    }
+
+    loadProgress() {
+      try {
+        const storage = (typeof window !== 'undefined' && window.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+        if (!storage) return false;
+        const raw = storage.getItem(this.STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== 'object') return false;
+
+        this.currentKingdomIndex = typeof data.currentKingdomIndex === 'number' ? data.currentKingdomIndex : 0;
+        this.currentLevelIndex = typeof data.currentLevelIndex === 'number' ? data.currentLevelIndex : 0;
+        this.kingdomLevels = Array.isArray(data.kingdomLevels) ? data.kingdomLevels : [this.currentLevelIndex, 0, 0];
+        this.collectedCrystals = Array.isArray(data.collectedCrystals) ? data.collectedCrystals : [];
+        return true;
+      } catch (e) {
+        console.warn('Unable to load game progress:', e);
+        return false;
+      }
+    }
+
+    resetProgress() {
+      this.currentKingdomIndex = 0;
+      this.currentLevelIndex = 0;
+      this.kingdomLevels = [0, 0, 0];
+      this.collectedCrystals = [];
+      try {
+        const storage = (typeof window !== 'undefined' && window.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+        if (storage) {
+          storage.removeItem(this.STORAGE_KEY);
+        }
+      } catch (e) {
+        console.warn('Unable to clear game progress:', e);
+      }
+    }
+  }
+
+  // ===========================================================================
+  // 2. SOUND EFFECTS (Web Audio Procedural Synthesizer - Zero External Files)
+  // ===========================================================================
+  class SoundEffects {
+    constructor() {
+      this.ctx = null;
+      this.muted = false;
+      this.isInitialized = false;
+    }
+
+    init() {
+      if (this.isInitialized && this.ctx) return;
+      try {
+        const AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
+        if (AudioCtx) {
+          this.ctx = new AudioCtx();
+          this.isInitialized = true;
+        }
+      } catch (e) {
+        console.warn('Web Audio API unavailable:', e);
+      }
+    }
+
+    toggleMute() {
+      this.muted = !this.muted;
+      return this.muted;
+    }
+
+    isMuted() {
+      return this.muted;
+    }
+
+    play(name) {
+      if (this.muted) return;
+      if (!this.ctx) {
+        this.init();
+      }
+      if (!this.ctx) return;
+
+      try {
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+        const now = this.ctx.currentTime;
+        switch (name) {
+          case 'click':
+            this._playClick(now);
+            break;
+          case 'correct':
+            this._playCorrect(now);
+            break;
+          case 'wrong':
+            this._playWrong(now);
+            break;
+          case 'crystal':
+            this._playCrystal(now);
+            break;
+          case 'fanfare':
+            this._playFanfare(now);
+            break;
+          default:
+            this._playClick(now);
+        }
+      } catch (e) {
+        // Safe no-op on audio errors
+      }
+    }
+
+    _playClick(now) {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(380, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.045);
+    }
+
+    _playCorrect(now) {
+      if (!this.ctx) return;
+      // Bright C-E-G chime arpeggio (C5: 523.25 Hz, E5: 659.25 Hz, G5: 783.99 Hz)
+      const notes = [523.25, 659.25, 783.99];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const start = now + (idx * 0.07);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.22, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(start);
+        osc.stop(start + 0.32);
+      });
+    }
+
+    _playWrong(now) {
+      if (!this.ctx) return;
+      // Friendly warm thud frequency drop (180 Hz down to 75 Hz)
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(75, now + 0.22);
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.23);
+    }
+
+    _playCrystal(now) {
+      if (!this.ctx) return;
+      // Shimmering resonant harmonics: A5, E6, A6, C#7
+      const freqs = [880, 1318.5, 1760, 2217.46];
+      freqs.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const start = now + (idx * 0.05);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.18, start);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.55);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(start);
+        osc.stop(start + 0.6);
+      });
+    }
+
+    _playFanfare(now) {
+      if (!this.ctx) return;
+      // Celebratory triad fanfare
+      const notes = [
+        { freq: 523.25, start: now, dur: 0.12 },
+        { freq: 659.25, start: now + 0.13, dur: 0.12 },
+        { freq: 783.99, start: now + 0.26, dur: 0.14 },
+        { freq: 1046.50, start: now + 0.42, dur: 0.55 }
+      ];
+      notes.forEach(n => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(n.freq, n.start);
+        gain.gain.setValueAtTime(0.25, n.start);
+        gain.gain.exponentialRampToValueAtTime(0.001, n.start + n.dur);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(n.start);
+        osc.stop(n.start + n.dur + 0.02);
+      });
+    }
+  }
+
+  // ===========================================================================
+  // 3. MINIMAP COMPONENT (Table J2 Checkpoint Progression Line)
+  // ===========================================================================
+  const MiniMapComponent = {
+    render(container, kingdomIdx = 0, currentLevelIdx = 0, options = {}) {
+      const stepsHtml = [];
+      for (let i = 0; i < 5; i++) {
+        let status = 'locked';
+        if (currentLevelIdx >= 5) {
+          status = 'completed';
+        } else if (i < currentLevelIdx) {
+          status = 'completed';
+        } else if (i === currentLevelIdx) {
+          status = 'active';
+        } else {
+          status = 'locked';
+        }
+
+        let badgeContent = '';
+        if (status === 'completed') {
+          badgeContent = `<svg class="icon-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>`;
+        } else if (status === 'active') {
+          badgeContent = `<span class="step-num">${i + 1}</span>`;
+        } else {
+          badgeContent = `<svg class="icon-lock" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94A3B8" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="#64748B"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+        }
+
+        const ariaCurrent = status === 'active' ? ' aria-current="step"' : '';
+        stepsHtml.push(`
+          <div class="minimap-step step-${status}" data-step-index="${i}" data-status="${status}"${ariaCurrent}>
+            <div class="step-badge ${status === 'active' ? 'badge-gold-halo' : ''}">
+              ${badgeContent}
+            </div>
+            <span class="step-label">Satwa ${i + 1}</span>
+          </div>
+        `);
+
+        if (i < 4) {
+          const isConnectorPassed = currentLevelIdx > i;
+          stepsHtml.push(`<div class="minimap-connector ${isConnectorPassed ? 'connector-filled' : ''}"></div>`);
+        }
+      }
+
+      const progressCount = Math.min(5, currentLevelIdx);
+      const html = `
+        <div class="minimap-wrapper" role="navigation" aria-label="Progres Kerajaan Satwa">
+          <div class="minimap-header">
+            <span class="minimap-title">Progres Tantangan</span>
+            <span class="minimap-counter">${progressCount}/5 Selesai</span>
+          </div>
+          <div class="minimap-track">
+            ${stepsHtml.join('')}
+          </div>
+        </div>
+      `;
+
+      if (container) {
+        if (typeof container === 'string') {
+          const el = typeof document !== 'undefined' ? document.querySelector(container) : null;
+          if (el) el.innerHTML = html;
+        } else if (container.innerHTML !== undefined) {
+          container.innerHTML = html;
+        }
+      }
+
+      return html;
+    }
+  };
+
+  // ===========================================================================
+  // 4. QUIZ CONTROLLER
+  // ===========================================================================
+  class QuizController {
+    constructor(engine, sfx, router) {
+      this.engine = engine;
+      this.sfx = sfx;
+      this.router = router;
+      this.isModalOpen = false;
+    }
+
+    loadCurrentChallenge() {
+      if (!this.engine) return;
+      const level = this.engine.getCurrentLevelData();
+      if (!level) return;
+
+      if (typeof document === 'undefined') return;
+
+      // Animal SVG Visual
+      const visualEl = document.getElementById('quiz-animal-visual');
+      if (visualEl && this.engine.gameData && this.engine.gameData.getAssetSvg) {
+        visualEl.innerHTML = this.engine.gameData.getAssetSvg(level.assetKey || level.id);
+      }
+
+      // Question text
+      const questionEl = document.getElementById('quiz-question');
+      if (questionEl) {
+        questionEl.textContent = level.question;
+      }
+
+      // Clue text
+      const clueEl = document.getElementById('quiz-clue');
+      if (clueEl) {
+        clueEl.textContent = level.clue;
+      }
+
+      // Level indicator
+      const levelIndEl = document.getElementById('quiz-level-indicator');
+      if (levelIndEl) {
+        levelIndEl.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+      }
+
+      // Kingdom badge
+      const kingdomBadgeEl = document.getElementById('quiz-kingdom-badge');
+      const kingdom = this.engine.getCurrentKingdom();
+      if (kingdomBadgeEl && kingdom) {
+        kingdomBadgeEl.textContent = kingdom.name;
+        if (kingdomBadgeEl.style) kingdomBadgeEl.style.backgroundColor = kingdom.color;
+      }
+
+      // Options Container
+      const optionsEl = document.getElementById('quiz-options-container');
+      if (optionsEl) {
+        const choices = level.choices || [
+          { key: 'A', text: (level.options[0] || '').replace(/^[A-C]\.\s*/, '') },
+          { key: 'B', text: (level.options[1] || '').replace(/^[A-C]\.\s*/, '') },
+          { key: 'C', text: (level.options[2] || '').replace(/^[A-C]\.\s*/, '') }
+        ];
+
+        optionsEl.innerHTML = choices.map(c => `
+          <button type="button" class="btn-clay btn-quiz-option" data-option-key="${c.key}">
+            <span class="option-key-badge">${c.key}</span>
+            <span class="option-text">${c.text}</span>
+          </button>
+        `).join('');
+      }
+
+      // MiniMap
+      const minimapEl = document.getElementById('quiz-minimap');
+      if (minimapEl) {
+        MiniMapComponent.render(minimapEl, this.engine.currentKingdomIndex, this.engine.currentLevelIndex);
+      }
+
+      // Reset feedback modal
+      this.closeFeedbackModal();
+    }
+
+    handleOptionSelect(optionKey) {
+      if (this.isModalOpen || !this.engine) return;
+      const validation = this.engine.validateAnswer(optionKey);
+
+      if (validation.isCorrect) {
+        if (this.sfx) this.sfx.play('correct');
+        this.showFeedbackModal({
+          isCorrect: true,
+          title: 'Hebat! Jawabanmu Benar!',
+          text: validation.feedback
+        });
+      } else {
+        if (this.sfx) this.sfx.play('wrong');
+        this.showFeedbackModal({
+          isCorrect: false,
+          title: 'Coba Lagi!',
+          text: 'Jawabanmu belum tepat. Ayo coba lagi!'
+        });
+      }
+    }
+
+    showFeedbackModal({ isCorrect, title, text }) {
+      if (typeof document === 'undefined') return;
+      this.isModalOpen = true;
+
+      const modal = document.getElementById('modal-feedback');
+      const titleEl = document.getElementById('feedback-title');
+      const textEl = document.getElementById('feedback-text');
+      const btnContinue = document.getElementById('btn-feedback-continue');
+      const btnRetry = document.getElementById('btn-feedback-retry');
+
+      if (titleEl) titleEl.textContent = title;
+      if (textEl) textEl.textContent = text;
+
+      if (btnContinue && btnContinue.style) {
+        btnContinue.style.display = isCorrect ? 'inline-flex' : 'none';
+      }
+      if (btnRetry && btnRetry.style) {
+        btnRetry.style.display = isCorrect ? 'none' : 'inline-flex';
+      }
+
+      if (modal) {
+        if (modal.classList && modal.classList.add) modal.classList.add('active');
+        if (modal.style) modal.style.display = 'flex';
+        if (modal.setAttribute) modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    closeFeedbackModal() {
+      this.isModalOpen = false;
+      if (typeof document === 'undefined') return;
+      const modal = document.getElementById('modal-feedback');
+      if (modal) {
+        if (modal.classList && modal.classList.remove) modal.classList.remove('active');
+        if (modal.style) modal.style.display = 'none';
+        if (modal.setAttribute) modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    handleContinue() {
+      this.closeFeedbackModal();
+      if (this.sfx) this.sfx.play('click');
+      if (!this.engine) return;
+
+      const result = this.engine.advanceLevel();
+
+      if (result.kingdomCompleted) {
+        if (result.allCompleted) {
+          if (this.router && this.router.victoryController) {
+            this.router.victoryController.showFinalVictory();
+          }
+          if (this.router) this.router.navigateTo('screen-final-victory');
+        } else {
+          if (this.router && this.router.rewardController) {
+            this.router.rewardController.showKingdomReward(this.engine.currentKingdomIndex);
+          }
+          if (this.router) this.router.navigateTo('screen-kingdom-reward');
+        }
+      } else {
+        this.loadCurrentChallenge();
+        if (this.router) this.router.navigateTo('screen-challenge');
+      }
+    }
+  }
+
+  // ===========================================================================
+  // 5. REWARD CONTROLLER
+  // ===========================================================================
+  class RewardController {
+    constructor(engine, sfx, router) {
+      this.engine = engine;
+      this.sfx = sfx;
+      this.router = router;
+    }
+
+    showKingdomReward(kingdomIdx) {
+      if (this.sfx) this.sfx.play('crystal');
+      const idx = (typeof kingdomIdx === 'number') ? kingdomIdx : (this.engine ? this.engine.currentKingdomIndex : 0);
+      if (!this.engine || !this.engine.gameData || !this.engine.gameData.kingdoms) return;
+      const kingdom = this.engine.gameData.kingdoms[idx];
+      if (!kingdom) return;
+
+      if (typeof document === 'undefined') return;
+
+      const titleEl = document.getElementById('reward-title');
+      if (titleEl) titleEl.textContent = kingdom.completion.title;
+
+      const descEl = document.getElementById('reward-text');
+      if (descEl) descEl.textContent = kingdom.completion.desc;
+
+      const crystalVisualEl = document.getElementById('reward-crystal-visual');
+      if (crystalVisualEl && this.engine.gameData.getAssetSvg) {
+        crystalVisualEl.innerHTML = this.engine.gameData.getAssetSvg(kingdom.crystalId);
+      }
+
+      const crystalNameEl = document.getElementById('reward-crystal-name');
+      if (crystalNameEl) crystalNameEl.textContent = kingdom.completion.reward;
+
+      const btnContinue = document.getElementById('btn-reward-continue');
+      if (btnContinue) {
+        if (idx < 2) {
+          const nextKingdom = this.engine.gameData.kingdoms[idx + 1];
+          const nextName = nextKingdom ? nextKingdom.name.toUpperCase() : 'BERIKUTNYA';
+          btnContinue.textContent = `LANJUT KE ${nextName}`;
+        } else {
+          btnContinue.textContent = 'SELESAIKAN PETUALANGAN';
+        }
+      }
+    }
+  }
+
+  // ===========================================================================
+  // 6. VICTORY CONTROLLER
+  // ===========================================================================
+  class VictoryController {
+    constructor(engine, sfx, router) {
+      this.engine = engine;
+      this.sfx = sfx;
+      this.router = router;
+    }
+
+    showFinalVictory() {
+      if (this.sfx) this.sfx.play('fanfare');
+
+      if (typeof document === 'undefined' || !this.engine) return;
+
+      const titleEl = document.getElementById('victory-title');
+      if (titleEl) {
+        titleEl.textContent = 'SELAMAT! KAMU TELAH MENYELESAIKAN SELURUH PETUALANGAN!';
+      }
+
+      const grandTitleEl = document.getElementById('victory-grand-title');
+      if (grandTitleEl) {
+        grandTitleEl.textContent = 'PENJAGA PENGETAHUAN SATWA MINI ZOO!';
+      }
+
+      const survivorVisualEl = document.getElementById('victory-survivor-visual');
+      if (survivorVisualEl && this.engine.gameData && this.engine.gameData.getAssetSvg) {
+        survivorVisualEl.innerHTML = this.engine.gameData.getAssetSvg('survivor');
+      }
+
+      const crystalsContainer = document.getElementById('victory-crystals-container');
+      if (crystalsContainer && this.engine.gameData && this.engine.gameData.getAssetSvg) {
+        crystalsContainer.innerHTML = `
+          <div class="victory-crystal-card">
+            <div class="crystal-icon">${this.engine.gameData.getAssetSvg('kristal_keberanian')}</div>
+            <span>Kristal Keberanian</span>
+          </div>
+          <div class="victory-crystal-card">
+            <div class="crystal-icon">${this.engine.gameData.getAssetSvg('kristal_kehidupan')}</div>
+            <span>Kristal Kehidupan</span>
+          </div>
+          <div class="victory-crystal-card">
+            <div class="crystal-icon">${this.engine.gameData.getAssetSvg('kristal_harmoni')}</div>
+            <span>Kristal Harmoni</span>
+          </div>
+        `;
+      }
+
+      this._spawnConfetti();
+    }
+
+    handlePlayAgain() {
+      if (this.sfx) this.sfx.play('click');
+      if (this.engine) this.engine.resetProgress();
+      if (this.router) {
+        this.router.navigateTo('screen-splash');
+      }
+    }
+
+    handleFinish() {
+      if (this.sfx) this.sfx.play('click');
+      if (typeof window !== 'undefined' && window.alert) {
+        window.alert('Terima kasih telah menjelajahi Mini Zoo! Sampai jumpa lagi, Penjaga Satwa!');
+      }
+    }
+
+    _spawnConfetti() {
+      if (typeof document === 'undefined') return;
+      const container = document.getElementById('victory-confetti');
+      if (!container || !document.createElement) return;
+
+      container.innerHTML = '';
+      const colors = ['#F59E0B', '#DC2626', '#16A34A', '#7C3AED', '#3B82F6', '#EC4899'];
+      for (let i = 0; i < 40; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-particle';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const size = Math.floor(Math.random() * 8) + 6;
+        const duration = (Math.random() * 2 + 1.5).toFixed(2);
+        const delay = (Math.random() * 1.5).toFixed(2);
+
+        piece.style.cssText = `
+          position: absolute;
+          top: -10px;
+          left: ${left}%;
+          width: ${size}px;
+          height: ${size * 0.6}px;
+          background-color: ${color};
+          transform: rotate(${Math.random() * 360}deg);
+          opacity: 0.9;
+          animation: confetti-fall ${duration}s ease-in ${delay}s infinite;
+          pointer-events: none;
+        `;
+        container.appendChild(piece);
+      }
+    }
+  }
+
+  // ===========================================================================
+  // 7. NAVIGATION ROUTER & BULLETPROOF EVENT CAPTURE DELEGATION
+  // ===========================================================================
+  class NavigationRouter {
+    constructor(options = {}) {
+      this.engine = options.engine || null;
+      this.sfx = options.sfx || null;
+      this.quizController = options.quizController || null;
+      this.rewardController = options.rewardController || null;
+      this.victoryController = options.victoryController || null;
+
+      this.currentScreen = 'screen-splash';
+      this.screens = [
+        'screen-splash',
+        'screen-instructions',
+        'screen-main-map',
+        'screen-kingdom-gate',
+        'screen-challenge',
+        'screen-kingdom-reward',
+        'screen-final-victory'
+      ];
+
+      if (typeof window !== 'undefined') {
+        window.navigateTo = (screenId) => this.navigateTo(screenId);
+        window.openKingdomGate = (idx) => this.openKingdomGate(idx);
+        window.toggleSound = () => (this.sfx ? this.sfx.toggleMute() : false);
+      }
+
+      this.setupEventListeners();
+    }
+
+    getCurrentScreen() {
+      return this.currentScreen;
+    }
+
+    navigateTo(screenId) {
+      if (!this.screens.includes(screenId)) {
+        console.warn(`Unknown screen ID: ${screenId}`);
+        return;
+      }
+
+      if (typeof document !== 'undefined') {
+        const allScreens = document.querySelectorAll ? document.querySelectorAll('.game-screen') : [];
+        if (allScreens && allScreens.forEach) {
+          allScreens.forEach(s => {
+            if (s.classList && s.classList.remove) s.classList.remove('active');
+            if (s.style) s.style.display = 'none';
+            if (s.setAttribute) s.setAttribute('aria-hidden', 'true');
+          });
+        }
+
+        const targetScreen = document.getElementById ? document.getElementById(screenId) : null;
+        if (targetScreen) {
+          if (targetScreen.classList && targetScreen.classList.add) targetScreen.classList.add('active');
+          if (targetScreen.style) targetScreen.style.display = 'flex';
+          if (targetScreen.setAttribute) targetScreen.setAttribute('aria-hidden', 'false');
+        }
+      }
+
+      this.currentScreen = screenId;
+      this._onScreenEnter(screenId);
+    }
+
+    _onScreenEnter(screenId) {
+      if (typeof document === 'undefined') return;
+
+      if (screenId === 'screen-splash') {
+        this._updateSplashScreen();
+      } else if (screenId === 'screen-main-map') {
+        this._updateMainMap();
+      } else if (screenId === 'screen-kingdom-gate') {
+        this._updateKingdomGate();
+      } else if (screenId === 'screen-challenge') {
+        if (this.quizController) {
+          this.quizController.loadCurrentChallenge();
+        }
+      } else if (screenId === 'screen-kingdom-reward') {
+        if (this.rewardController && this.engine) {
+          this.rewardController.showKingdomReward(this.engine.currentKingdomIndex);
+        }
+      } else if (screenId === 'screen-final-victory') {
+        if (this.victoryController) {
+          this.victoryController.showFinalVictory();
+        }
+      }
+    }
+
+    _updateSplashScreen() {
+      if (!this.engine || typeof document === 'undefined') return;
+      const hasProgress = this.engine.hasSavedProgress();
+      const btnStart = document.getElementById ? document.getElementById('btn-start-adventure') : null;
+      const btnResume = document.getElementById ? document.getElementById('btn-resume-adventure') : null;
+      const btnNew = document.getElementById ? document.getElementById('btn-new-adventure') : null;
+      const savedInfo = document.getElementById ? document.getElementById('splash-saved-info') : null;
+
+      if (btnStart && btnStart.style) btnStart.style.display = hasProgress ? 'none' : 'inline-flex';
+      if (btnResume && btnResume.style) btnResume.style.display = hasProgress ? 'inline-flex' : 'none';
+      if (btnNew && btnNew.style) btnNew.style.display = hasProgress ? 'inline-flex' : 'none';
+
+      if (savedInfo) {
+        if (hasProgress) {
+          const kingdom = this.engine.getCurrentKingdom();
+          if (savedInfo.style) savedInfo.style.display = 'block';
+          savedInfo.textContent = `Progres tersimpan: ${kingdom ? kingdom.name : ''} (Tantangan ${Math.min(5, this.engine.currentLevelIndex + 1)}/5)`;
+        } else {
+          if (savedInfo.style) savedInfo.style.display = 'none';
+        }
+      }
+    }
+
+    _updateMainMap() {
+      if (!this.engine || typeof document === 'undefined') return;
+      for (let i = 0; i < 3; i++) {
+        const card = document.getElementById ? (document.getElementById(`card-kingdom-${i}`) || (document.querySelector ? document.querySelector(`[data-kingdom-index="${i}"]`) : null)) : null;
+        if (card) {
+          const isUnlocked = this.engine.isKingdomUnlocked(i);
+          const progressCount = this.engine.getKingdomProgressCount(i);
+          const isCompleted = progressCount >= 5;
+
+          if (card.classList && card.classList.toggle) {
+            card.classList.toggle('card-unlocked', isUnlocked);
+            card.classList.toggle('card-locked', !isUnlocked);
+            card.classList.toggle('card-completed', isCompleted);
+          }
+
+          const badge = card.querySelector ? card.querySelector('.kingdom-progress-badge') : null;
+          if (badge) {
+            badge.textContent = `${progressCount}/5 Selesai`;
+          }
+
+          const statusLabel = card.querySelector ? card.querySelector('.kingdom-status-label') : null;
+          if (statusLabel) {
+            if (isCompleted) {
+              statusLabel.textContent = 'Selesai';
+            } else if (isUnlocked) {
+              statusLabel.textContent = 'Terbuka';
+            } else {
+              statusLabel.textContent = 'Terkunci';
+            }
+          }
+        }
+      }
+    }
+
+    _updateKingdomGate() {
+      if (!this.engine || typeof document === 'undefined') return;
+      const kingdom = this.engine.getCurrentKingdom();
+      if (!kingdom) return;
+
+      const gateTitle = document.getElementById ? document.getElementById('gate-title') : null;
+      if (gateTitle && kingdom.intro) gateTitle.textContent = kingdom.intro.title;
+
+      const gateDesc = document.getElementById ? document.getElementById('gate-description') : null;
+      if (gateDesc && kingdom.intro) gateDesc.textContent = kingdom.intro.desc;
+
+      const gateCastleVisual = document.getElementById ? document.getElementById('gate-castle-visual') : null;
+      if (gateCastleVisual && this.engine.gameData && this.engine.gameData.getAssetSvg) {
+        gateCastleVisual.innerHTML = this.engine.gameData.getAssetSvg(kingdom.castleKey);
+      }
+    }
+
+    openKingdomGate(kingdomIdx) {
+      if (!this.engine) return;
+      if (this.engine.isKingdomUnlocked(kingdomIdx)) {
+        if (this.sfx) this.sfx.play('click');
+        this.engine.setKingdom(kingdomIdx);
+        this.navigateTo('screen-kingdom-gate');
+      } else {
+        if (this.sfx) this.sfx.play('wrong');
+        const prevKingdom = this.engine.gameData && this.engine.gameData.kingdoms ? this.engine.gameData.kingdoms[kingdomIdx - 1] : null;
+        const prevName = prevKingdom ? prevKingdom.name : 'sebelumnya';
+        if (typeof window !== 'undefined' && window.alert) {
+          window.alert(`Kerajaan ini masih terkunci! Selesaikan semua tantangan di ${prevName} terlebih dahulu.`);
+        }
+      }
+    }
+
+    setupEventListeners() {
+      if (typeof document === 'undefined' || !document.addEventListener) return;
+
+      const handleGlobalInteraction = (e) => {
+        const target = e.target && e.target.closest ? e.target.closest('[id], button, a, [data-action], [data-kingdom-index], [data-option-key]') : null;
+        if (!target) return;
+
+        const id = target.id || '';
+        const action = target.getAttribute ? (target.getAttribute('data-action') || '') : '';
+        const kingdomIndexAttr = target.getAttribute ? target.getAttribute('data-kingdom-index') : null;
+        const optionKeyAttr = target.getAttribute ? target.getAttribute('data-option-key') : null;
+
+        // Click sound for buttons (except quiz options which have their own sound logic)
+        if (target.tagName === 'BUTTON' && !target.classList.contains('btn-quiz-option')) {
+          if (this.sfx) this.sfx.play('click');
+        }
+
+        // Handle Option Select
+        if (optionKeyAttr || target.classList.contains('btn-quiz-option')) {
+          const key = optionKeyAttr || (target.getAttribute ? target.getAttribute('data-option-key') : null);
+          if (key && this.quizController) {
+            this.quizController.handleOptionSelect(key);
+          }
+          return;
+        }
+
+        // Handle Kingdom Card Clicks
+        if (kingdomIndexAttr !== null && kingdomIndexAttr !== undefined && kingdomIndexAttr !== '') {
+          const idx = parseInt(kingdomIndexAttr, 10);
+          if (!isNaN(idx)) {
+            this.openKingdomGate(idx);
+          }
+          return;
+        }
+        if (id.startsWith('card-kingdom-')) {
+          const idx = parseInt(id.replace('card-kingdom-', ''), 10);
+          if (!isNaN(idx)) {
+            this.openKingdomGate(idx);
+          }
+          return;
+        }
+
+        // Action / Button ID routing
+        const routeKey = id || action;
+        switch (routeKey) {
+          case 'btn-start-adventure':
+            this.navigateTo('screen-instructions');
+            break;
+
+          case 'btn-resume-adventure':
+            if (this.engine) {
+              this.engine.loadProgress();
+              if (this.engine.collectedCrystals.length >= 3) {
+                this.navigateTo('screen-final-victory');
+              } else if (this.engine.currentLevelIndex >= 5) {
+                this.navigateTo('screen-main-map');
+              } else {
+                this.navigateTo('screen-challenge');
+              }
+            }
+            break;
+
+          case 'btn-new-adventure':
+            if (this.engine) {
+              this.engine.resetProgress();
+            }
+            this.navigateTo('screen-instructions');
+            break;
+
+          case 'btn-start-mission':
+            this.navigateTo('screen-main-map');
+            break;
+
+          case 'btn-back-splash':
+            this.navigateTo('screen-splash');
+            break;
+
+          case 'btn-start-challenge':
+            this.navigateTo('screen-challenge');
+            break;
+
+          case 'btn-back-to-map':
+          case 'btn-back-map':
+            this.navigateTo('screen-main-map');
+            break;
+
+          case 'btn-map-quick-start':
+            this.navigateTo('screen-challenge');
+            break;
+
+          case 'btn-feedback-continue':
+          case 'btn-quiz-continue':
+            if (this.quizController) {
+              this.quizController.handleContinue();
+            }
+            break;
+
+          case 'btn-feedback-retry':
+            if (this.quizController) {
+              this.quizController.closeFeedbackModal();
+            }
+            break;
+
+          case 'btn-reward-continue':
+            if (this.engine) {
+              if (this.engine.currentKingdomIndex < 2) {
+                this.engine.advanceKingdom();
+                this.navigateTo('screen-main-map');
+              } else {
+                this.navigateTo('screen-final-victory');
+              }
+            }
+            break;
+
+          case 'btn-play-again':
+            if (this.victoryController) {
+              this.victoryController.handlePlayAgain();
+            } else if (this.engine) {
+              this.engine.resetProgress();
+              this.navigateTo('screen-splash');
+            }
+            break;
+
+          case 'btn-toggle-sound':
+          case 'toggle-sound':
+            if (this.sfx) {
+              const muted = this.sfx.toggleMute();
+              const soundBtn = document.getElementById ? document.getElementById('btn-toggle-sound') : null;
+              if (soundBtn) {
+                if (soundBtn.setAttribute) soundBtn.setAttribute('aria-pressed', String(muted));
+                if (soundBtn.classList && soundBtn.classList.toggle) soundBtn.classList.toggle('sound-muted', muted);
+              }
+            }
+            break;
+        }
+      };
+
+      // BULLETPROOF EVENT CAPTURE DELEGATION:
+      // Captures click and touchend at top document level with capture=true
+      document.addEventListener('click', handleGlobalInteraction, true);
+      document.addEventListener('touchend', handleGlobalInteraction, { capture: true, passive: true });
+    }
+  }
+
+  // ===========================================================================
+  // 8. BOOTSTRAP INITIALIZATION
+  // ===========================================================================
+  let defaultEngine = null;
+  let defaultSfx = null;
+  let defaultRouter = null;
+
+  function initApp() {
+    const data = typeof window !== 'undefined' && window.GAME_DATA ? window.GAME_DATA : null;
+    defaultEngine = new GameEngine(data);
+    defaultSfx = new SoundEffects();
+
+    const quizController = new QuizController(defaultEngine, defaultSfx, null);
+    const rewardController = new RewardController(defaultEngine, defaultSfx, null);
+    const victoryController = new VictoryController(defaultEngine, defaultSfx, null);
+
+    defaultRouter = new NavigationRouter({
+      engine: defaultEngine,
+      sfx: defaultSfx,
+      quizController,
+      rewardController,
+      victoryController
+    });
+
+    quizController.router = defaultRouter;
+    rewardController.router = defaultRouter;
+    victoryController.router = defaultRouter;
+
+    defaultRouter.quizController = quizController;
+    defaultRouter.rewardController = rewardController;
+    defaultRouter.victoryController = victoryController;
+
+    if (typeof window !== 'undefined') {
+      window.gameEngine = defaultEngine;
+      window.soundEffects = defaultSfx;
+      window.navigationRouter = defaultRouter;
+      window.quizController = quizController;
+      window.rewardController = rewardController;
+      window.victoryController = victoryController;
+    }
+
+    if (defaultEngine.hasSavedProgress()) {
+      defaultEngine.loadProgress();
+    }
+    defaultRouter.navigateTo('screen-splash');
+  }
+
+  // Autostart in browser if document is ready
+  if (typeof window !== 'undefined' && typeof document !== 'undefined' && document.addEventListener) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  }
+
+  // ===========================================================================
+  // 9. EXPORTS (Browser Window & Node.js CommonJS)
+  // ===========================================================================
+  if (typeof window !== 'undefined') {
+    window.GameEngine = GameEngine;
+    window.SoundEffects = SoundEffects;
+    window.MiniMapComponent = MiniMapComponent;
+    window.QuizController = QuizController;
+    window.RewardController = RewardController;
+    window.VictoryController = VictoryController;
+    window.NavigationRouter = NavigationRouter;
+    window.initApp = initApp;
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      GameEngine,
+      SoundEffects,
+      MiniMapComponent,
+      QuizController,
+      RewardController,
+      VictoryController,
+      NavigationRouter,
+      initApp
+    };
+  }
+})(typeof window !== 'undefined' ? window : this);
+</script>
