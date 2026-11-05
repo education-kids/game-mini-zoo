@@ -1,6 +1,6 @@
 # Petualangan Mini Zoo Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a robust, 100% naskah-compliant, bug-free interactive educational game for Google Apps Script Web App and standalone browsers based on `NASKAH ALUR PERMAINAN.docx`.
 
@@ -37,11 +37,11 @@
 **Interfaces:**
 - Produces: Test runner CLI (`node tests/run_tests.js`) and Standalone bundle generator (`node scripts/build_standalone.js`).
 
-- [ ] **Step 1: Write failing test runner in `tests/run_tests.js`**
-- [ ] **Step 2: Run `node tests/run_tests.js` to verify failure**
-- [ ] **Step 3: Implement `package.json`, `scripts/build_standalone.js`, and initial test harness**
-- [ ] **Step 4: Run `node tests/run_tests.js` to verify PASS**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Write failing test runner in `tests/run_tests.js`**
+- [x] **Step 2: Run `node tests/run_tests.js` to verify failure**
+- [x] **Step 3: Implement `package.json`, `scripts/build_standalone.js`, and initial test harness**
+- [x] **Step 4: Run `node tests/run_tests.js` to verify PASS**
+- [x] **Step 5: Commit**
   ```bash
   git add package.json scripts/build_standalone.js tests/run_tests.js
   git commit -m "chore: setup test runner and standalone build compiler"
@@ -58,11 +58,11 @@
 **Interfaces:**
 - Produces: Global `GAME_DATA` object containing `kingdoms`, `levels` (15 animals), `narratives`, `crystals`, and `getAssetSvg(key)`.
 
-- [ ] **Step 1: Add unit tests for all 15 levels, verbatim questions, keys, and SVG manifest in `tests/run_tests.js`**
-- [ ] **Step 2: Run tests to verify failure**
-- [ ] **Step 3: Implement `src/GameData.html` with all 15 animals verbatim and rich SVG art**
-- [ ] **Step 4: Run tests to verify PASS**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Add unit tests for all 15 levels, verbatim questions, keys, and SVG manifest in `tests/run_tests.js`**
+- [x] **Step 2: Run tests to verify failure**
+- [x] **Step 3: Implement `src/GameData.html` with all 15 animals verbatim and rich SVG art**
+- [x] **Step 4: Run tests to verify PASS**
+- [x] **Step 5: Commit**
   ```bash
   git add src/GameData.html tests/run_tests.js
   git commit -m "feat(data): implement verbatim game data and svg asset library"
@@ -79,11 +79,11 @@
 **Interfaces:**
 - Produces: `GameEngine`, `SoundEffects`, `NavigationRouter`, `MiniMapComponent`, `QuizController`, `RewardController`, `VictoryController`.
 
-- [ ] **Step 1: Add unit tests for GameEngine state transitions (Table J2), Option A session storage, and Audio synthesizer**
-- [ ] **Step 2: Run tests to verify failure**
-- [ ] **Step 3: Implement `GameEngine`, `SoundEffects`, `MiniMapComponent`, `QuizController`, and `NavigationRouter` in `src/JavaScript.html`**
-- [ ] **Step 4: Run tests to verify PASS**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Add unit tests for GameEngine state transitions (Table J2), Option A session storage, and Audio synthesizer**
+- [x] **Step 2: Run tests to verify failure**
+- [x] **Step 3: Implement `GameEngine`, `SoundEffects`, `MiniMapComponent`, `QuizController`, and `NavigationRouter` in `src/JavaScript.html`**
+- [x] **Step 4: Run tests to verify PASS**
+- [x] **Step 5: Commit**
   ```bash
   git add src/JavaScript.html tests/run_tests.js
   git commit -m "feat(engine): implement game state machine, audio synthesizer, and navigation router"
@@ -100,11 +100,11 @@
 **Interfaces:**
 - Produces: Responsive 16:9 CSS layout, Claymorphism button styling, zero-jitter transform rules, and high-contrast accessibility themes.
 
-- [ ] **Step 1: Add CSS unit tests checking 16:9 canvas, contrast tokens, and absence of button jitter**
-- [ ] **Step 2: Run tests to verify failure**
-- [ ] **Step 3: Implement complete stylesheet in `src/Stylesheet.html`**
-- [ ] **Step 4: Run tests to verify PASS**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Add CSS unit tests checking 16:9 canvas, contrast tokens, and absence of button jitter**
+- [x] **Step 2: Run tests to verify failure**
+- [x] **Step 3: Implement complete stylesheet in `src/Stylesheet.html`**
+- [x] **Step 4: Run tests to verify PASS**
+- [x] **Step 5: Commit**
   ```bash
   git add src/Stylesheet.html tests/run_tests.js
   git commit -m "feat(ui): implement responsive 16:9 claymorphism safari stylesheet"
@@ -123,11 +123,11 @@
 **Interfaces:**
 - Produces: Complete SPA views (Splash with Option A buttons, Instructions, Main Map, Kingdom Gate, Quiz Challenge, Kingdom Reward, Final Victory).
 
-- [ ] **Step 1: Add tests verifying DOM element presence, accessibility roles, and GAS entry point**
-- [ ] **Step 2: Run tests to verify failure**
-- [ ] **Step 3: Implement `src/Index.html`, `src/Code.gs`, and `src/appsscript.json`**
-- [ ] **Step 4: Run tests to verify PASS**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Add tests verifying DOM element presence, accessibility roles, and GAS entry point**
+- [x] **Step 2: Run tests to verify failure**
+- [x] **Step 3: Implement `src/Index.html`, `src/Code.gs`, and `src/appsscript.json`**
+- [x] **Step 4: Run tests to verify PASS**
+- [x] **Step 5: Commit**
   ```bash
   git add src/Index.html src/Code.gs src/appsscript.json tests/run_tests.js
   git commit -m "feat(dom): implement spa markup and google apps script entry point"
@@ -145,11 +145,11 @@
 **Interfaces:**
 - Produces: Single-file `index.html` bundle (<1 MB) ready for 1-click paste into Google Apps Script.
 
-- [ ] **Step 1: Write comprehensive end-to-end simulation test simulating complete player journey from Splash to Final Victory**
-- [ ] **Step 2: Run test suite to verify end-to-end progression and Option A session resume**
-- [ ] **Step 3: Run `node scripts/build_standalone.js` to generate standalone `index.html`**
-- [ ] **Step 4: Verify standalone bundle size, asset completeness, and zero console errors**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Write comprehensive end-to-end simulation test simulating complete player journey from Splash to Final Victory**
+- [x] **Step 2: Run test suite to verify end-to-end progression and Option A session resume**
+- [x] **Step 3: Run `node scripts/build_standalone.js` to generate standalone `index.html`**
+- [x] **Step 4: Verify standalone bundle size, asset completeness, and zero console errors**
+- [x] **Step 5: Commit**
   ```bash
   git add index.html tests/e2e_simulation.test.js tests/run_tests.js
   git commit -m "test(e2e): verify full gameplay journey and build standalone bundle"
