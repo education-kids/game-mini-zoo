@@ -537,7 +537,6 @@
       if (typeof document === 'undefined') return;
       this.isModalOpen = true;
 
-      const modal = document.getElementById('modal-feedback');
       const titleEl = document.getElementById('feedback-title');
       const textEl = document.getElementById('feedback-text');
       const btnContinue = document.getElementById('btn-feedback-continue');
@@ -553,22 +552,31 @@
         btnRetry.style.display = isCorrect ? 'none' : 'inline-flex';
       }
 
-      if (modal) {
-        if (modal.classList && modal.classList.add) modal.classList.add('active');
-        if (modal.style) modal.style.display = 'flex';
-        if (modal.setAttribute) modal.setAttribute('aria-hidden', 'false');
-      }
+      const modals = [
+        document.getElementById('modal-feedback'),
+        document.getElementById('feedback-modal')
+      ].filter(Boolean);
+
+      modals.forEach(m => {
+        if (m.classList && m.classList.add) m.classList.add('active');
+        if (m.style) m.style.display = 'flex';
+        if (m.setAttribute) m.setAttribute('aria-hidden', 'false');
+      });
     }
 
     closeFeedbackModal() {
       this.isModalOpen = false;
       if (typeof document === 'undefined') return;
-      const modal = document.getElementById('modal-feedback');
-      if (modal) {
-        if (modal.classList && modal.classList.remove) modal.classList.remove('active');
-        if (modal.style) modal.style.display = 'none';
-        if (modal.setAttribute) modal.setAttribute('aria-hidden', 'true');
-      }
+      const modals = [
+        document.getElementById('modal-feedback'),
+        document.getElementById('feedback-modal')
+      ].filter(Boolean);
+
+      modals.forEach(m => {
+        if (m.classList && m.classList.remove) m.classList.remove('active');
+        if (m.style) m.style.display = 'none';
+        if (m.setAttribute) m.setAttribute('aria-hidden', 'true');
+      });
     }
 
     handleContinue() {
@@ -808,6 +816,8 @@
     _onScreenEnter(screenId) {
       if (typeof document === 'undefined') return;
 
+      this._updateTopHud();
+
       if (screenId === 'screen-splash') {
         this._updateSplashScreen();
       } else if (screenId === 'screen-main-map') {
@@ -829,6 +839,32 @@
       }
     }
 
+    _updateTopHud() {
+      if (!this.engine || typeof document === 'undefined') return;
+      const collected = this.engine.collectedCrystals || [];
+      const slots = [
+        { id: 'slot-kristal-keberanian', key: 'kristal_keberanian' },
+        { id: 'slot-kristal-kehidupan', key: 'kristal_kehidupan' },
+        { id: 'slot-kristal-harmoni', key: 'kristal_harmoni' }
+      ];
+
+      slots.forEach(slot => {
+        const el = document.getElementById ? document.getElementById(slot.id) : null;
+        if (el) {
+          const hasCrystal = collected.includes(slot.key);
+          if (el.classList && el.classList.toggle) {
+            el.classList.toggle('crystal-collected', hasCrystal);
+            el.classList.toggle('crystal-empty', !hasCrystal);
+          }
+          if (hasCrystal && this.engine.gameData && this.engine.gameData.getAssetSvg) {
+            el.innerHTML = this.engine.gameData.getAssetSvg(slot.key);
+          } else {
+            el.innerHTML = '';
+          }
+        }
+      });
+    }
+
     _updateSplashScreen() {
       if (!this.engine || typeof document === 'undefined') return;
       const hasProgress = this.engine.hasSavedProgress();
@@ -836,8 +872,10 @@
       const btnResume = document.getElementById ? document.getElementById('btn-resume-adventure') : null;
       const btnNew = document.getElementById ? document.getElementById('btn-new-adventure') : null;
       const savedInfo = document.getElementById ? document.getElementById('splash-saved-info') : null;
+      const resumeBox = document.getElementById ? document.getElementById('session-resume-box') : null;
 
       if (btnStart && btnStart.style) btnStart.style.display = hasProgress ? 'none' : 'inline-flex';
+      if (resumeBox && resumeBox.style) resumeBox.style.display = hasProgress ? 'flex' : 'none';
       if (btnResume && btnResume.style) btnResume.style.display = hasProgress ? 'inline-flex' : 'none';
       if (btnNew && btnNew.style) btnNew.style.display = hasProgress ? 'inline-flex' : 'none';
 
@@ -1000,6 +1038,10 @@
             this.navigateTo('screen-challenge');
             break;
 
+          case 'btn-back-to-gate':
+            this.navigateTo('screen-kingdom-gate');
+            break;
+
           case 'btn-back-to-map':
           case 'btn-back-map':
             this.navigateTo('screen-main-map');
@@ -1017,6 +1059,7 @@
             break;
 
           case 'btn-feedback-retry':
+          case 'btn-feedback-close':
             if (this.quizController) {
               this.quizController.closeFeedbackModal();
             }
@@ -1042,14 +1085,38 @@
             }
             break;
 
+          case 'btn-finish-game':
+            if (this.engine) {
+              this.engine.resetProgress();
+            }
+            this.navigateTo('screen-splash');
+            break;
+
+          case 'sound-toggle':
           case 'btn-toggle-sound':
           case 'toggle-sound':
             if (this.sfx) {
               const muted = this.sfx.toggleMute();
-              const soundBtn = document.getElementById ? document.getElementById('btn-toggle-sound') : null;
+              const soundBtn = (document.getElementById ? document.getElementById('sound-toggle') : null) ||
+                               (document.getElementById ? document.getElementById('btn-toggle-sound') : null);
               if (soundBtn) {
                 if (soundBtn.setAttribute) soundBtn.setAttribute('aria-pressed', String(muted));
                 if (soundBtn.classList && soundBtn.classList.toggle) soundBtn.classList.toggle('sound-muted', muted);
+              }
+            }
+            break;
+
+          case 'btn-fullscreen':
+            if (typeof document !== 'undefined') {
+              if (!document.fullscreenElement) {
+                const docEl = document.documentElement || document.body;
+                if (docEl && docEl.requestFullscreen) {
+                  docEl.requestFullscreen().catch(() => {});
+                }
+              } else {
+                if (document.exitFullscreen) {
+                  document.exitFullscreen().catch(() => {});
+                }
               }
             }
             break;

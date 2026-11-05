@@ -315,18 +315,64 @@ html, body {
 }
 
 /* ==========================================================================
-   7. FLOATING CONTROLS (AUDIO & NAVIGATION HEADER)
+   7. FLOATING CONTROLS (TOP HUD, AUDIO & NAVIGATION)
    ========================================================================== */
-.floating-header-controls {
+.top-hud-container {
   position: absolute;
-  top: 16px;
-  right: 18px;
+  top: 12px;
+  left: 16px;
+  right: 16px;
   z-index: 50;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
+.hud-crystals-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11, 35, 18, 0.88);
+  border: 2px solid var(--color-wood-medium);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.hud-crystal-slot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1.5px dashed rgba(245, 158, 11, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.hud-crystal-slot.crystal-collected {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1.5px solid var(--color-gold);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.hud-crystal-slot svg {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.floating-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.btn-fullscreen-toggle,
 .btn-sound-toggle {
   width: 44px;
   height: 44px;
@@ -339,14 +385,17 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
   transition: transform 0.1s ease, filter 0.1s ease;
 }
 
+.btn-fullscreen-toggle:hover,
 .btn-sound-toggle:hover {
   transform: translateY(-2px);
   filter: brightness(1.15);
 }
 
+.btn-fullscreen-toggle:active,
 .btn-sound-toggle:active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 #2A1002;
@@ -358,6 +407,29 @@ html, body {
 
 .btn-sound-toggle.sound-muted .sound-slash {
   display: block !important;
+}
+
+.session-resume-box,
+#session-resume-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.map-footer {
+  position: relative;
+  height: 70px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ==========================================================================

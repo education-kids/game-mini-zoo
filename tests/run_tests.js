@@ -1098,6 +1098,190 @@ describe('Task 4: Stylesheet (Responsive 16:9, Claymorphism Tokens & Zero-Jitter
 });
 
 // =============================================================================
+// Task 5: 16:9 SPA DOM Structure & Google Apps Script Backend
+// =============================================================================
+describe('Task 5: Google Apps Script Backend (src/Code.gs & src/appsscript.json)', () => {
+  const codeGsPath = path.join(SRC_DIR, 'Code.gs');
+  const manifestPath = path.join(SRC_DIR, 'appsscript.json');
+
+  it('src/Code.gs exists and implements doGet(e) and include(filename)', () => {
+    assert.ok(fs.existsSync(codeGsPath), 'src/Code.gs must exist');
+    const content = fs.readFileSync(codeGsPath, 'utf8');
+
+    // doGet checks
+    assert.ok(content.includes('function doGet('), 'Must define function doGet(e)');
+    assert.ok(content.includes("createTemplateFromFile('Index')"), 'Must create template from Index');
+    assert.ok(content.includes('.evaluate()'), 'Must evaluate template');
+    assert.ok(content.includes(".setTitle('Petualangan Mini Zoo - Game Edukasi Satwa 3D')"), 'Must set exact page title');
+    assert.ok(content.includes(".addMetaTag('viewport'"), 'Must add viewport meta tag');
+    assert.ok(content.includes('XFrameOptionsMode.ALLOWALL'), 'Must set XFrameOptionsMode to ALLOWALL');
+
+    // include checks
+    assert.ok(content.includes('function include('), 'Must define function include(filename)');
+    assert.ok(content.includes('createHtmlOutputFromFile(filename)'), 'Must create HtmlOutput from file');
+    assert.ok(content.includes('.getContent()'), 'Must return html content');
+  });
+
+  it('src/appsscript.json exists and contains valid manifest properties', () => {
+    assert.ok(fs.existsSync(manifestPath), 'src/appsscript.json must exist');
+    const raw = fs.readFileSync(manifestPath, 'utf8');
+    const manifest = JSON.parse(raw);
+
+    assert.strictEqual(manifest.timeZone, 'Asia/Jakarta', 'timeZone must be Asia/Jakarta');
+    assert.strictEqual(manifest.runtimeVersion, 'V8', 'runtimeVersion must be V8');
+    assert.ok(manifest.webapp, 'webapp configuration object must exist');
+    assert.strictEqual(manifest.webapp.access, 'ANYONE_ANONYMOUS', 'webapp.access must be ANYONE_ANONYMOUS');
+    assert.strictEqual(manifest.webapp.executeAs, 'USER_DEPLOYING', 'webapp.executeAs must be USER_DEPLOYING');
+  });
+});
+
+describe('Task 5: 16:9 SPA HTML Structure (src/Index.html)', () => {
+  const indexPath = path.join(SRC_DIR, 'Index.html');
+
+  function getIndexContent() {
+    assert.ok(fs.existsSync(indexPath), 'src/Index.html must exist');
+    return fs.readFileSync(indexPath, 'utf8');
+  }
+
+  it('src/Index.html exists and contains Google Apps Script include tags', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes("<?!= include('Stylesheet'); ?>"), "Must include Stylesheet in <head>");
+    assert.ok(html.includes("<?!= include('GameData'); ?>"), "Must include GameData before </body>");
+    assert.ok(html.includes("<?!= include('JavaScript'); ?>"), "Must include JavaScript before </body>");
+
+    // Order check: Stylesheet in head, GameData and JavaScript at end
+    const headEnd = html.indexOf('</head>');
+    const stylePos = html.indexOf("<?!= include('Stylesheet'); ?>");
+    assert.ok(stylePos < headEnd && stylePos > 0, "Stylesheet must be inside <head>");
+
+    const bodyEnd = html.indexOf('</body>');
+    const gameDataPos = html.indexOf("<?!= include('GameData'); ?>");
+    const jsPos = html.indexOf("<?!= include('JavaScript'); ?>");
+    assert.ok(gameDataPos < bodyEnd && gameDataPos > headEnd, "GameData must be before </body>");
+    assert.ok(jsPos < bodyEnd && jsPos > gameDataPos, "JavaScript must be after GameData and before </body>");
+  });
+
+  it('Top HUD defines 3 crystal slots, sound toggle, and fullscreen button', () => {
+    const html = getIndexContent();
+
+    // 3 crystal slots
+    assert.ok(html.includes('id="slot-kristal-keberanian"'), 'Must have #slot-kristal-keberanian');
+    assert.ok(html.includes('id="slot-kristal-kehidupan"'), 'Must have #slot-kristal-kehidupan');
+    assert.ok(html.includes('id="slot-kristal-harmoni"'), 'Must have #slot-kristal-harmoni');
+
+    // Floating controls
+    assert.ok(html.includes('id="sound-toggle"'), 'Must have #sound-toggle');
+    assert.ok(html.includes('id="btn-fullscreen"'), 'Must have #btn-fullscreen');
+  });
+
+  it('Defines all 7 SPA screens with exact required IDs', () => {
+    const html = getIndexContent();
+    const requiredScreens = [
+      'screen-splash',
+      'screen-instructions',
+      'screen-main-map',
+      'screen-kingdom-gate',
+      'screen-challenge',
+      'screen-kingdom-reward',
+      'screen-final-victory'
+    ];
+
+    requiredScreens.forEach(screenId => {
+      assert.ok(html.includes(`id="${screenId}"`), `Must define screen element with id="${screenId}"`);
+    });
+  });
+
+  it('Screen 1 (Splash) defines Option A session resumption controls and Survivor art', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="btn-start-adventure"'), 'Must define #btn-start-adventure');
+    assert.ok(html.includes('id="session-resume-box"'), 'Must define #session-resume-box');
+    assert.ok(html.includes('id="btn-resume-adventure"'), 'Must define #btn-resume-adventure');
+    assert.ok(html.includes('id="btn-new-adventure"'), 'Must define #btn-new-adventure');
+    assert.ok(html.includes('id="splash-hero-art"'), 'Must define #splash-hero-art');
+    assert.ok(html.includes('PETUALANGAN MINI ZOO'), 'Must include title PETUALANGAN MINI ZOO');
+  });
+
+  it('Screen 2 (Instructions) defines verbatim rule cards and navigation buttons', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="btn-back-splash"'), 'Must define #btn-back-splash');
+    assert.ok(html.includes('id="btn-start-mission"'), 'Must define #btn-start-mission');
+    assert.ok(html.includes('Kerajaan Karnivora'), 'Must mention Kerajaan Karnivora');
+    assert.ok(html.includes('Kerajaan Herbivora'), 'Must mention Kerajaan Herbivora');
+    assert.ok(html.includes('Kerajaan Omnivora'), 'Must mention Kerajaan Omnivora');
+  });
+
+  it('Screen 3 (Main Map) defines 3 kingdom castle portals and quick start button', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="card-kingdom-0"'), 'Must define #card-kingdom-0');
+    assert.ok(html.includes('id="card-kingdom-1"'), 'Must define #card-kingdom-1');
+    assert.ok(html.includes('id="card-kingdom-2"'), 'Must define #card-kingdom-2');
+    assert.ok(html.includes('id="btn-map-quick-start"'), 'Must define #btn-map-quick-start');
+  });
+
+  it('Screen 4 (Kingdom Gate) defines gate visual, description, and action buttons', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="gate-castle-visual"'), 'Must define #gate-castle-visual');
+    assert.ok(html.includes('id="gate-title"'), 'Must define #gate-title');
+    assert.ok(html.includes('id="gate-description"'), 'Must define #gate-description');
+    assert.ok(html.includes('id="btn-back-to-map"'), 'Must define #btn-back-to-map');
+    assert.ok(html.includes('id="btn-start-challenge"'), 'Must define #btn-start-challenge');
+  });
+
+  it('Screen 5 (Challenge) defines checkpoint minimap, clue box, options container, and back button', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="quiz-minimap"'), 'Must define #quiz-minimap');
+    assert.ok(html.includes('id="quiz-animal-visual"'), 'Must define #quiz-animal-visual');
+    assert.ok(html.includes('id="quiz-question"'), 'Must define #quiz-question');
+    assert.ok(html.includes('id="quiz-clue"'), 'Must define #quiz-clue');
+    assert.ok(html.includes('id="quiz-options-container"'), 'Must define #quiz-options-container');
+    assert.ok(html.includes('id="btn-back-to-gate"'), 'Must define #btn-back-to-gate');
+  });
+
+  it('Screen 6 (Reward) defines crystal showcase, reward text, and continue button', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="reward-crystal-visual"'), 'Must define #reward-crystal-visual');
+    assert.ok(html.includes('id="reward-title"'), 'Must define #reward-title');
+    assert.ok(html.includes('id="btn-reward-continue"'), 'Must define #btn-reward-continue');
+  });
+
+  it('Screen 7 (Final Victory) defines conferred title and end buttons', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="victory-title"'), 'Must define #victory-title');
+    assert.ok(html.includes('id="victory-grand-title"'), 'Must define #victory-grand-title');
+    assert.ok(html.includes('PENJAGA PENGETAHUAN SATWA MINI ZOO!'), 'Must include verbatim conferred title');
+    assert.ok(html.includes('id="victory-survivor-visual"'), 'Must define #victory-survivor-visual');
+    assert.ok(html.includes('id="victory-crystals-container"'), 'Must define #victory-crystals-container');
+    assert.ok(html.includes('id="btn-play-again"'), 'Must define #btn-play-again');
+    assert.ok(html.includes('id="btn-finish-game"'), 'Must define #btn-finish-game');
+  });
+
+  it('Feedback modal defines required dialog elements', () => {
+    const html = getIndexContent();
+    assert.ok(html.includes('id="feedback-modal"'), 'Must define #feedback-modal');
+    assert.ok(html.includes('id="feedback-title"'), 'Must define #feedback-title');
+    assert.ok(html.includes('id="feedback-text"'), 'Must define #feedback-text');
+    assert.ok(html.includes('id="btn-feedback-retry"'), 'Must define #btn-feedback-retry');
+    assert.ok(html.includes('id="btn-feedback-continue"'), 'Must define #btn-feedback-continue');
+  });
+
+  it('Enforces Anti-Slop: zero generic emojis in visible copy of Index.html', () => {
+    const html = getIndexContent();
+    const emojiRegex = /[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
+    assert.strictEqual(emojiRegex.test(html), false, 'src/Index.html must NOT contain generic emoji characters');
+  });
+
+  it('Standalone build bundles src/Index.html seamlessly into index.html', () => {
+    const { compileStandalone } = require(path.join(SCRIPTS_DIR, 'build_standalone.js'));
+    const bundle = compileStandalone({ dryRun: false });
+    assert.ok(bundle, 'Standalone bundle must be generated');
+    assert.ok(fs.existsSync(path.join(ROOT_DIR, 'index.html')), 'Root index.html must exist');
+    assert.ok(!bundle.includes('<?!='), 'Standalone bundle must not contain <?!= tags');
+    assert.ok(bundle.includes('screen-splash'), 'Standalone bundle must contain screen-splash');
+    assert.ok(bundle.includes('PENJAGA PENGETAHUAN SATWA MINI ZOO!'), 'Standalone bundle must contain final victory title');
+  });
+});
+
+// =============================================================================
 // Test Runner Summary & Exit Code
 // =============================================================================
 console.log('\n========================================');
