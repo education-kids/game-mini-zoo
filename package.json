@@ -1,0 +1,19 @@
+{
+  "name": "petualangan-mini-zoo",
+  "version": "2.0.0",
+  "description": "Petualangan Mini Zoo - Interactive Educational Game for Google Apps Script Web App and Standalone Browsers",
+  "main": "scripts/build_standalone.js",
+  "scripts": {
+    "test": "node tests/run_tests.js",
+    "build": "node scripts/build_standalone.js"
+  },
+  "keywords": [
+    "google-apps-script",
+    "educational-game",
+    "karnivora",
+    "herbivora",
+    "omnivora"
+  ],
+  "author": "Petualangan Mini Zoo Team",
+  "license": "MIT"
+}
