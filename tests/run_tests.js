@@ -912,6 +912,192 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
 });
 
 // =============================================================================
+// Task 4: Responsive Safari Design System & Tactile 3D Styling
+// =============================================================================
+describe('Task 4: Stylesheet (Responsive 16:9, Claymorphism Tokens & Zero-Jitter Rules)', () => {
+  const stylesheetPath = path.join(SRC_DIR, 'Stylesheet.html');
+
+  function getStylesheetContent() {
+    assert.ok(fs.existsSync(stylesheetPath), 'src/Stylesheet.html must exist');
+    return fs.readFileSync(stylesheetPath, 'utf8');
+  }
+
+  it('src/Stylesheet.html exists and is wrapped inside <style> tags', () => {
+    assert.ok(fs.existsSync(stylesheetPath), 'src/Stylesheet.html must exist');
+    const content = fs.readFileSync(stylesheetPath, 'utf8').trim();
+    assert.ok(content.startsWith('<style'), 'src/Stylesheet.html must start with <style>');
+    assert.ok(content.endsWith('</style>'), 'src/Stylesheet.html must end with </style>');
+  });
+
+  it('Defines required CSS custom properties (colors, wood tones, kingdom themes, typography)', () => {
+    const css = getStylesheetContent();
+
+    // Font family check
+    assert.ok(css.includes('Fredoka'), 'Must declare Fredoka font in font-family');
+    assert.ok(css.includes('Nunito'), 'Must include Nunito font');
+
+    // Forest Green variables
+    assert.ok(css.includes('--color-forest-dark: #0B2312') || css.includes('--color-forest-dark:#0B2312'), 'Must define --color-forest-dark: #0B2312');
+    assert.ok(css.includes('--color-forest-medium: #1B4323') || css.includes('--color-forest-medium:#1B4323'), 'Must define --color-forest-medium: #1B4323');
+
+    // Safari Timber / Wood variables
+    assert.ok(css.includes('--color-wood-dark: #451A03') || css.includes('--color-wood-dark:#451A03'), 'Must define --color-wood-dark: #451A03');
+    assert.ok(css.includes('--color-wood-medium: #78350F') || css.includes('--color-wood-medium:#78350F'), 'Must define --color-wood-medium: #78350F');
+    assert.ok(css.includes('--color-gold: #F59E0B') || css.includes('--color-gold:#F59E0B'), 'Must define --color-gold: #F59E0B');
+
+    // Karnivora Crimson
+    assert.ok(css.includes('--color-karnivora: #DC2626') || css.includes('--color-karnivora:#DC2626'), 'Must define --color-karnivora: #DC2626');
+    assert.ok(css.includes('--color-karnivora-bg: #450A0A') || css.includes('--color-karnivora-bg:#450A0A'), 'Must define --color-karnivora-bg: #450A0A');
+
+    // Herbivora Emerald
+    assert.ok(css.includes('--color-herbivora: #16A34A') || css.includes('--color-herbivora:#16A34A'), 'Must define --color-herbivora: #16A34A');
+    assert.ok(css.includes('--color-herbivora-bg: #052E16') || css.includes('--color-herbivora-bg:#052E16'), 'Must define --color-herbivora-bg: #052E16');
+
+    // Omnivora Purple
+    assert.ok(css.includes('--color-omnivora: #7C3AED') || css.includes('--color-omnivora:#7C3AED'), 'Must define --color-omnivora: #7C3AED');
+    assert.ok(css.includes('--color-omnivora-bg: #2E1065') || css.includes('--color-omnivora-bg:#2E1065'), 'Must define --color-omnivora-bg: #2E1065');
+  });
+
+  it('Defines responsive 16:9 canvas container (.game-canvas-container / .slide-canvas-stage)', () => {
+    const css = getStylesheetContent();
+    assert.ok(
+      css.includes('.game-canvas-container') || css.includes('.slide-canvas-stage'),
+      'Must define .game-canvas-container or .slide-canvas-stage'
+    );
+    assert.ok(
+      css.includes('aspect-ratio: 16 / 9') || css.includes('aspect-ratio:16/9') || css.includes('aspect-ratio: 16/9'),
+      'Must specify aspect-ratio: 16 / 9'
+    );
+    assert.ok(
+      css.includes('max-width: 1140px') || css.includes('max-width:1140px'),
+      'Must specify max-width: 1140px'
+    );
+  });
+
+  it('Enforces strict zero-jitter button rules preserving translateX(-50%) on base, hover, and active states', () => {
+    const css = getStylesheetContent();
+
+    // Check centered CTA selectors
+    const requiredSelectors = [
+      '.hotspot-splash-start',
+      '.hotspot-instructions-start',
+      '.hotspot-gate-start',
+      '.hotspot-reward-continue',
+      '.btn-centered'
+    ];
+
+    requiredSelectors.forEach(sel => {
+      assert.ok(css.includes(sel), `CSS must include selector ${sel}`);
+    });
+
+    // Base state checks: left: 50% and transform: translateX(-50%)
+    assert.ok(
+      css.includes('left: 50% !important') || css.includes('left:50%!important'),
+      'Centered buttons must specify left: 50% !important'
+    );
+    assert.ok(
+      css.includes('transform: translateX(-50%) !important') || css.includes('transform:translateX(-50%)!important'),
+      'Centered buttons base must specify transform: translateX(-50%) !important'
+    );
+    assert.ok(
+      css.includes('animation: none !important') || css.includes('animation:none!important'),
+      'Centered buttons must have animation: none !important to prevent jumping'
+    );
+
+    // Hover state preserves translateX(-50%)
+    assert.ok(
+      css.includes('transform: translateX(-50%) translateY(-2px) !important') ||
+      css.includes('transform:translateX(-50%) translateY(-2px)!important'),
+      'Hover state must preserve translateX(-50%) translateY(-2px) !important'
+    );
+
+    // Active state preserves translateX(-50%)
+    assert.ok(
+      css.includes('transform: translateX(-50%) translateY(3px) !important') ||
+      css.includes('transform:translateX(-50%) translateY(3px)!important'),
+      'Active state must preserve translateX(-50%) translateY(3px) !important'
+    );
+  });
+
+  it('Sets pointer-events: none on CTA button inner spans and labels to prevent click interception', () => {
+    const css = getStylesheetContent();
+
+    const requiredInnerSelectors = [
+      '.slide-hotspot-cta span',
+      '.pro-game-cta-btn span',
+      '.cta-play-icon',
+      '.cta-btn-label'
+    ];
+
+    requiredInnerSelectors.forEach(sel => {
+      assert.ok(css.includes(sel), `CSS must target inner child: ${sel}`);
+    });
+
+    assert.ok(
+      css.includes('pointer-events: none !important') || css.includes('pointer-events:none!important'),
+      'CTA inner spans must set pointer-events: none !important'
+    );
+  });
+
+  it('Defines 3D tactile button styles (.btn-3d-green, .btn-3d-gold, .btn-3d-wood)', () => {
+    const css = getStylesheetContent();
+
+    // Green 3D button
+    assert.ok(css.includes('.btn-3d-green'), 'Must define .btn-3d-green');
+    assert.ok(css.includes('#66BB6A'), 'Green 3D button gradient must contain #66BB6A');
+    assert.ok(css.includes('#2E7D32'), 'Green 3D button gradient must contain #2E7D32');
+    assert.ok(css.includes('#1B5E20'), 'Green 3D button gradient must contain #1B5E20');
+    assert.ok(css.includes('#FFE082'), 'Green 3D button border must contain #FFE082');
+
+    // Gold 3D button
+    assert.ok(css.includes('.btn-3d-gold'), 'Must define .btn-3d-gold');
+    assert.ok(css.includes('#FBBF24'), 'Gold 3D button gradient must contain #FBBF24');
+    assert.ok(css.includes('#D97706'), 'Gold 3D button gradient must contain #D97706');
+    assert.ok(css.includes('#92400E'), 'Gold 3D button gradient must contain #92400E');
+    assert.ok(css.includes('#FFFBEB'), 'Gold 3D button border must contain #FFFBEB');
+
+    // Wood 3D button
+    assert.ok(css.includes('.btn-3d-wood'), 'Must define .btn-3d-wood');
+    assert.ok(css.includes('#B45309'), 'Wood 3D button gradient must contain #B45309');
+    assert.ok(css.includes('#78350F'), 'Wood 3D button gradient must contain #78350F');
+    assert.ok(css.includes('#451A03'), 'Wood 3D button gradient must contain #451A03');
+    assert.ok(css.includes('#FDE68A'), 'Wood 3D button border must contain #FDE68A');
+  });
+
+  it('Defines SPA screen visibility rules and feedback modal parchment styling', () => {
+    const css = getStylesheetContent();
+
+    // SPA screen display rules
+    assert.ok(
+      css.includes('.screen {') || css.includes('.game-screen {') || css.includes('.screen,') || css.includes('.game-screen,'),
+      'Must define screen hiding rule'
+    );
+    assert.ok(
+      css.includes('display: none !important') || css.includes('display:none!important'),
+      'Screen hiding must use display: none !important'
+    );
+    assert.ok(
+      css.includes('.screen.active') || css.includes('.game-screen.active'),
+      'Must define active screen rule'
+    );
+    assert.ok(
+      css.includes('display: flex !important') || css.includes('display:flex!important'),
+      'Active screen must use display: flex !important'
+    );
+
+    // Feedback modal styling
+    assert.ok(
+      css.includes('#feedback-modal') || css.includes('#modal-feedback'),
+      'Must style #feedback-modal / #modal-feedback'
+    );
+    assert.ok(
+      css.includes('#FFFDF0') || css.includes('#fffdf0'),
+      'Parchment modal must use background #FFFDF0'
+    );
+  });
+});
+
+// =============================================================================
 // Test Runner Summary & Exit Code
 // =============================================================================
 console.log('\n========================================');
