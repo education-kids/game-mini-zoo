@@ -1,0 +1,162 @@
+HEADING: Kerajaan Karnivora.
+HEADING: Kerajaan Herbivora.
+HEADING: Kerajaan Omnivora.
+IMAGE: ['image42.png'] | TEXT: 
+HEADING: Layar pembuka.
+HEADING: Petunjuk permainan.
+HEADING: Peta utama tiga kerajaan.
+HEADING: Pembukaan Kerajaan Karnivora.
+HEADING: Pembukaan Kerajaan Herbivora.
+HEADING: Pembukaan Kerajaan Omnivora.
+HEADING: Layar kemenangan akhir.
+IMAGE: ['image43.png'] | TEXT: 
+IMAGE: ['image22.png'] | TEXT: 
+IMAGE: ['image9.png'] | TEXT: 
+HEADING: "Petualanganmu dimulai di Kerajaan Karnivora."
+HEADING: "Setelah itu, lanjutkan perjalanan ke Kerajaan Herbivora dan Kerajaan Omnivora."
+HEADING: Kerajaan dimainkan secara berurutan.
+HEADING: Kerajaan berikutnya terbuka setelah kerajaan sebelumnya selesai.
+HEADING: F1. Pembukaan Kerajaan Karnivora
+IMAGE: ['image8.png'] | TEXT: 
+HEADING: "Selamat datang di Kerajaan Karnivora!"
+HEADING: Identitas kerajaan: Emblem telapak kaki.Reward: Kristal Keberanian.
+IMAGE: ['image24.png'] | TEXT: 
+IMAGE: ['image2.png'] | TEXT: 
+IMAGE: ['image33.png'] | TEXT: 
+IMAGE: ['image4.png'] | TEXT: 
+IMAGE: ['image3.png'] | TEXT: 
+HEADING: F3. Tantangan Karnivora
+HEADING: Level 1 — Singa
+IMAGE: ['image12.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap berada di slide Tantangan Singa dan diberi kesempatan mencoba kembali.
+IMAGE: ['image2.png'] | TEXT: 
+HEADING: Level 2 — Harimau
+IMAGE: ['image7.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap berada di slide Tantangan Harimau dan mencoba kembali.
+IMAGE: ['image36.png'] | TEXT: 
+HEADING: Level 3 — Buaya
+IMAGE: ['image15.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap berada di slide Tantangan Buaya dan mencoba kembali.
+IMAGE: ['image4.png'] | TEXT: 
+HEADING: Level 4 — Serigala
+IMAGE: ['image23.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap berada di slide Tantangan Serigala dan mencoba kembali.
+IMAGE: ['image3.png'] | TEXT: 
+HEADING: Level 5 — Hiu
+IMAGE: ['image11.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap berada di slide Tantangan Hiu dan mencoba kembali.
+IMAGE: ['image16.png'] | TEXT: 
+HEADING: F4. Penyelesaian Kerajaan Karnivora
+IMAGE: ['image28.png'] | TEXT: 
+HEADING: "Selamat! Semua hewan di Kerajaan Karnivora telah berhasil kamu kenali!"
+HEADING: "Luar biasa! Kamu telah menyelamatkan semua hewan di Kerajaan Karnivora!"
+HEADING: Reward: Kristal Keberanian × 1.
+HEADING: G1. Pembukaan Kerajaan Herbivora
+IMAGE: ['image27.png'] | TEXT: 
+HEADING: "Selamat datang di Kerajaan Herbivora!"
+HEADING: Identitas kerajaan: Emblem daun.Reward: Kristal Kehidupan.
+IMAGE: ['image13.png'] | TEXT: 
+IMAGE: ['image1.png'] | TEXT: 
+IMAGE: ['image21.png'] | TEXT: 
+IMAGE: ['image19.png'] | TEXT: 
+IMAGE: ['image5.png'] | TEXT: 
+HEADING: G3. Tantangan Herbivora
+HEADING: Level 1 — Sapi
+IMAGE: ['image20.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Sapi dan mencoba kembali.
+IMAGE: ['image13.png'] | TEXT: 
+HEADING: Level 2 — Kelinci
+IMAGE: ['image47.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Kelinci dan mencoba kembali.
+IMAGE: ['image21.png'] | TEXT: 
+HEADING: Level 3 — Jerapah
+IMAGE: ['image37.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Jerapah dan mencoba kembali.
+IMAGE: ['image19.png'] | TEXT: 
+HEADING: Level 4 — Gajah
+IMAGE: ['image40.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Gajah dan mencoba kembali.
+IMAGE: ['image5.png'] | TEXT: 
+HEADING: Level 5 — Rusa
+IMAGE: ['image25.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Rusa dan mencoba kembali.
+IMAGE: ['image44.png'] | TEXT: 
+HEADING: G4. Penyelesaian Kerajaan Herbivora
+IMAGE: ['image49.png'] | TEXT: 
+HEADING: "Selamat! Semua hewan di Kerajaan Herbivora telah berhasil kamu kenali!"
+HEADING: "Hebat! Kamu berhasil menemukan kelima hewan Kerajaan Herbivora!"
+HEADING: Reward: Kristal Kehidupan × 1.Nama item: Herbivore Emerald.Makna: Simbol kehidupan dan keseimbangan 
+HEADING: H1. Pembukaan Kerajaan Omnivora
+IMAGE: ['image6.png'] | TEXT: 
+HEADING: "Selamat datang di Kerajaan Omnivora!"
+HEADING: Identitas kerajaan: Emblem daun dan daging.Reward: Kristal Harmoni.
+IMAGE: ['image14.jpg'] | TEXT: 
+IMAGE: ['image18.jpg'] | TEXT: 
+IMAGE: ['image41.jpg'] | TEXT: 
+IMAGE: ['image39.jpg'] | TEXT: 
+IMAGE: ['image32.jpg'] | TEXT: 
+HEADING: H3. Tantangan Omnivora
+HEADING: Level 1 — Beruang
+IMAGE: ['image29.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Beruang dan mencoba kembali.
+IMAGE: ['image14.jpg'] | TEXT: 
+HEADING: Level 2 — Ayam
+IMAGE: ['image45.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Ayam dan mencoba kembali.
+IMAGE: ['image41.jpg'] | TEXT: 
+HEADING: Level 3 — Babi
+IMAGE: ['image38.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Babi dan mencoba kembali.
+IMAGE: ['image39.jpg'] | TEXT: 
+HEADING: Level 4 — Monyet
+IMAGE: ['image10.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Monyet dan mencoba kembali.
+IMAGE: ['image32.jpg'] | TEXT: 
+HEADING: Level 5 — Gagak
+IMAGE: ['image46.png'] | TEXT: 
+HEADING: Petunjuk:
+HEADING: Jika salah: Pemain tetap di slide Tantangan Gagak dan mencoba kembali.
+IMAGE: ['image48.png'] | TEXT: 
+HEADING: H4. Penyelesaian Kerajaan Omnivora
+IMAGE: ['image34.png'] | TEXT: 
+HEADING: "Selamat! Semua hewan di Kerajaan Omnivora telah berhasil kamu kenali!"
+HEADING: "Kamu telah berhasil menyelesaikan seluruh tantangan Kerajaan Omnivora."
+HEADING: Reward: Kristal Harmoni × 1.Makna: Simbol keseimbangan dan keberagaman makanan.
+IMAGE: ['image17.png'] | TEXT: 
+IMAGE: ['image35.png'] | TEXT: 
+HEADING: Layar ini muncul setelah pemain menyelesaikan Kerajaan Omnivora dan menekan tombol SELESAIKAN PETUAL
+HEADING: Level
+HEADING: Kerajaan berikutnya terbuka setelah kerajaan sebelumnya diselesaikan dan pemain melanjutkan perjalan
+HEADING: Sampul → Petunjuk → Peta Utama → Karnivora → Lima Tantangan Karnivora → Reward Karnivora → Herbivora
+HEADING: Petunjuk
+HEADING: Petunjuk Permainan
+HEADING: Peta Utama Tiga Kerajaan
+HEADING: Gerbang Kerajaan Karnivora
+HEADING: Level 1 sampai Level 5
+HEADING: Tantangan Karnivora
+HEADING: Reward Karnivora
+HEADING: Gerbang Kerajaan Herbivora
+HEADING: Level 1 sampai Level 5
+HEADING: Tantangan Herbivora
+HEADING: Reward Herbivora
+HEADING: Gerbang Kerajaan Omnivora
+HEADING: Level 1 sampai Level 5
+HEADING: Tantangan Omnivora
+HEADING: Reward Omnivora
+HEADING: Layar Kemenangan Akhir
+HEADING: Reward diberikan satu kali setelah lima tantangan dalam kerajaan selesai.
+HEADING: Layar kemenangan akhir hanya terbuka setelah seluruh 15 tantangan selesai.
