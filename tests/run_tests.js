@@ -1282,6 +1282,12 @@ describe('Task 5: 16:9 SPA HTML Structure (src/Index.html)', () => {
 });
 
 // =============================================================================
+// Task 6: End-to-End Gameplay Simulation & Standalone Bundle Integrity
+// =============================================================================
+const { runE2ETests } = require(path.join(__dirname, 'e2e_simulation.test.js'));
+runE2ETests({ describe, it });
+
+// =============================================================================
 // Test Runner Summary & Exit Code
 // =============================================================================
 console.log('\n========================================');
