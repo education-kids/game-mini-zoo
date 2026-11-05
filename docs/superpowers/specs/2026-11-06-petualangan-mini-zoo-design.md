@@ -232,8 +232,20 @@ proyek/
 
 ---
 
-## 7. Rencana Verifikasi Kualitas
+## 7. Kebijakan Sesi & Perangkat Bersama (Shared Devices)
+Sesuai kesepakatan (Opsi A):
+- Progres game disimpan di `localStorage` per peramban (`mini_zoo_progress_v2`).
+- Jika terdapat progres aktif sebelumnya (misal level > 0 atau ada kristal terkumpul):
+  - Layar Pembuka menampilkan status progres saat ini dan menyediakan dua tombol aksi:
+    1. **"LANJUTKAN PETUALANGAN"** (melanjutkan dari kerajaan/level terakhir yang belum tuntas).
+    2. **"MULAI PETUALANGAN BARU"** (mereset seluruh data progres ke Level 1 Kerajaan Karnivora setelah konfirmasi cepat).
+- Jika belum ada progres tersimpan (atau setelah direset), hanya tombol utama **"MULAI PETUALANGAN"** yang muncul.
+
+---
+
+## 8. Rencana Verifikasi Kualitas
 1. **Verifikasi Teks Naskah:** Pemeriksaan verbatim 15 soal, petunjuk, opsi, dan penjelasan edukasi.
 2. **Uji Klik Headless Chrome:** Pengujian simulasi klik mouse nyata pada setiap tombol transisi layar (termasuk verifikasi tidak ada loncatan kursor/getar).
 3. **Uji Eksekusi Apps Script:** Pengujian rendering via `HtmlService.createHtmlOutputFromFile` dan `createTemplateFromFile`.
 4. **Uji State Machine Mini Map:** Pemeriksaan transisi 0/5 hingga 5/5 sesuai Tabel J2 naskah.
+
