@@ -908,6 +908,23 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
     btnMission.appendChild(missionIcon);
     document.dispatchEvent({ type: 'click', target: missionIcon });
     assert.strictEqual(router.getCurrentScreen(), 'screen-main-map', 'Click on inner icon of mission button must navigate to screen-main-map');
+
+    // Test btn-back-to-gate from gate to map
+    router.navigateTo('screen-kingdom-gate');
+    assert.strictEqual(router.getCurrentScreen(), 'screen-kingdom-gate');
+    const backBtn = document.getElementById('btn-back-to-gate');
+    backBtn.tagName = 'BUTTON';
+    const backSpan = document.createElement('span');
+    backSpan.textContent = 'Peta';
+    backBtn.appendChild(backSpan);
+    document.dispatchEvent({ type: 'click', target: backSpan });
+    assert.strictEqual(router.getCurrentScreen(), 'screen-main-map', 'Click on btn-back-to-gate from gate must navigate to screen-main-map');
+
+    // Test btn-back-to-gate from challenge to gate
+    router.navigateTo('screen-challenge');
+    assert.strictEqual(router.getCurrentScreen(), 'screen-challenge');
+    document.dispatchEvent({ type: 'click', target: backBtn });
+    assert.strictEqual(router.getCurrentScreen(), 'screen-kingdom-gate', 'Click on btn-back-to-gate from challenge must navigate to screen-kingdom-gate');
   });
 });
 

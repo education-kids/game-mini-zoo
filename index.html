@@ -377,6 +377,12 @@ html, body {
   box-shadow: 0 1px 0 #2A1002 !important;
 }
 
+.hud-back-btn span,
+.hud-back-btn svg,
+.hud-back-btn * {
+  pointer-events: none !important;
+}
+
 .hud-crystals-bar {
   display: flex;
   align-items: center;
@@ -1383,7 +1389,7 @@ html, body {
       <header class="top-hud-container" id="game-hud" aria-label="HUD Permainan">
         <!-- Left Section: Navigation Back & Crystal Collection -->
         <div class="hud-left-section">
-          <button id="btn-back-to-gate" class="hud-back-btn btn-3d-wood" type="button" aria-label="Kembali ke Gerbang" style="display:none;">
+          <button id="btn-back-to-gate" class="hud-back-btn btn-3d-wood" type="button" aria-label="Kembali ke Gerbang" onclick="if(window.navigationRouter){window.navigationRouter.handleBackNav();}else if(window.handleBackNav){window.handleBackNav();}" style="display:none;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
@@ -4106,10 +4112,12 @@ html, body {
           backBtn.style.display = 'inline-flex';
           const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
           if (span) span.textContent = 'Gerbang';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang');
         } else if (this.currentScreen === 'screen-kingdom-gate') {
           backBtn.style.display = 'inline-flex';
           const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
           if (span) span.textContent = 'Peta';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta');
         } else {
           backBtn.style.display = 'none';
         }
@@ -4232,6 +4240,20 @@ html, body {
       }
     }
 
+    handleBackNav() {
+      if (this.currentScreen === 'screen-kingdom-gate') {
+        this.navigateTo('screen-main-map');
+      } else if (this.currentScreen === 'screen-challenge') {
+        this.navigateTo('screen-kingdom-gate');
+      } else if (this.currentScreen === 'screen-instructions') {
+        this.navigateTo('screen-splash');
+      } else if (this.currentScreen === 'screen-main-map') {
+        this.navigateTo('screen-splash');
+      } else {
+        this.navigateTo('screen-main-map');
+      }
+    }
+
     setupEventListeners() {
       if (typeof document === 'undefined' || !document.addEventListener) return;
 
@@ -4314,7 +4336,7 @@ html, body {
             break;
 
           case 'btn-back-to-gate':
-            this.navigateTo('screen-kingdom-gate');
+            this.handleBackNav();
             break;
 
           case 'btn-back-to-map':
@@ -4444,6 +4466,8 @@ html, body {
       window.quizController = quizController;
       window.rewardController = rewardController;
       window.victoryController = victoryController;
+      window.navigateTo = (screenId) => defaultRouter.navigateTo(screenId);
+      window.handleBackNav = () => defaultRouter.handleBackNav();
     }
 
     if (defaultEngine.hasSavedProgress()) {

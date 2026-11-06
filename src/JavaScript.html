@@ -876,10 +876,12 @@
           backBtn.style.display = 'inline-flex';
           const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
           if (span) span.textContent = 'Gerbang';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang');
         } else if (this.currentScreen === 'screen-kingdom-gate') {
           backBtn.style.display = 'inline-flex';
           const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
           if (span) span.textContent = 'Peta';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta');
         } else {
           backBtn.style.display = 'none';
         }
@@ -1002,6 +1004,20 @@
       }
     }
 
+    handleBackNav() {
+      if (this.currentScreen === 'screen-kingdom-gate') {
+        this.navigateTo('screen-main-map');
+      } else if (this.currentScreen === 'screen-challenge') {
+        this.navigateTo('screen-kingdom-gate');
+      } else if (this.currentScreen === 'screen-instructions') {
+        this.navigateTo('screen-splash');
+      } else if (this.currentScreen === 'screen-main-map') {
+        this.navigateTo('screen-splash');
+      } else {
+        this.navigateTo('screen-main-map');
+      }
+    }
+
     setupEventListeners() {
       if (typeof document === 'undefined' || !document.addEventListener) return;
 
@@ -1084,7 +1100,7 @@
             break;
 
           case 'btn-back-to-gate':
-            this.navigateTo('screen-kingdom-gate');
+            this.handleBackNav();
             break;
 
           case 'btn-back-to-map':
@@ -1214,6 +1230,8 @@
       window.quizController = quizController;
       window.rewardController = rewardController;
       window.victoryController = victoryController;
+      window.navigateTo = (screenId) => defaultRouter.navigateTo(screenId);
+      window.handleBackNav = () => defaultRouter.handleBackNav();
     }
 
     if (defaultEngine.hasSavedProgress()) {
