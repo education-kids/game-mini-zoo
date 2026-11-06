@@ -126,7 +126,7 @@ html, body {
   inset: 0;
   width: 100%;
   height: 100%;
-  padding: 24px 32px;
+  padding: 70px 24px 20px 24px !important;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
@@ -319,68 +319,140 @@ html, body {
    ========================================================================== */
 .top-hud-container {
   position: absolute;
-  top: 12px;
-  left: 16px;
-  right: 16px;
-  z-index: 50;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  pointer-events: none;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(8, 26, 13, 0.96) 0%, rgba(12, 38, 20, 0.90) 100%);
+  border-bottom: 2px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  box-sizing: border-box;
+  backdrop-filter: blur(8px);
+}
+
+.hud-left-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hud-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(180deg, #78350F 0%, #451A03 100%);
+  border: 2px solid var(--color-gold);
+  color: var(--color-gold-light);
+  box-shadow: 0 3px 0 #2A1002, 0 4px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.1s ease, filter 0.1s ease;
+  min-height: 36px;
+}
+
+.hud-back-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.hud-back-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #2A1002 !important;
 }
 
 .hud-crystals-bar {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(11, 35, 18, 0.88);
-  border: 2px solid var(--color-wood-medium);
+  background: linear-gradient(180deg, #451A03 0%, #2A1002 100%);
+  border: 2px solid var(--color-gold);
   border-radius: 9999px;
-  padding: 4px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-  pointer-events: auto;
+  padding: 3px 10px;
+  box-shadow: 0 3px 0 #180800, inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .hud-crystal-slot {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1.5px dashed rgba(245, 158, 11, 0.4);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1.5px dashed rgba(245, 158, 11, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .hud-crystal-slot.crystal-collected {
-  background: rgba(245, 158, 11, 0.2);
-  border: 1.5px solid var(--color-gold);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  background: radial-gradient(circle, #F59E0B 0%, #78350F 85%);
+  border: 2px solid #FEF08A;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.85);
 }
 
 .hud-crystal-slot svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
-.floating-header-controls {
+.hud-center-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-realm-badge-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid var(--color-wood-medium);
+  border-radius: 9999px;
+  padding: 3px 14px 3px 5px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.quiz-kingdom-badge {
+  font-size: 0.88rem;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  color: #FFFFFF;
+  background-color: var(--color-karnivora);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.4px;
+}
+
+.quiz-level-indicator {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-gold-light);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.hud-right-section.floating-header-controls {
   display: flex;
   align-items: center;
   gap: 10px;
-  pointer-events: auto;
 }
 
 .btn-fullscreen-toggle,
 .btn-sound-toggle {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(180deg, #78350F 0%, #451A03 100%);
   border: 2px solid var(--color-gold);
   color: var(--color-gold-light);
-  box-shadow: 0 4px 0 #2A1002, 0 6px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 0 #2A1002, 0 4px 8px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -398,7 +470,7 @@ html, body {
 .btn-fullscreen-toggle:active,
 .btn-sound-toggle:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 #2A1002;
+  box-shadow: 0 1px 0 #2A1002 !important;
 }
 
 .btn-sound-toggle.sound-muted .sound-wave {
@@ -818,43 +890,20 @@ html, body {
    ========================================================================== */
 #screen-challenge {
   background: radial-gradient(circle at 50% 30%, #1B4323 0%, #0B2312 85%);
-  padding: 16px 28px;
+  padding: 68px 24px 16px 24px !important;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.quiz-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.quiz-kingdom-badge {
-  font-size: 0.95rem;
-  font-weight: 800;
-  padding: 4px 16px;
-  border-radius: 9999px;
-  color: #FFFFFF;
-  background-color: var(--color-karnivora);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-
-.quiz-level-indicator {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--color-gold-light);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
 /* MiniMap Horizontal Track */
 .minimap-wrapper {
-  background: rgba(7, 23, 11, 0.85);
+  background: rgba(7, 23, 11, 0.9);
   border-radius: 14px;
-  padding: 8px 18px;
-  border: 1.5px solid rgba(245, 158, 11, 0.3);
-  margin-bottom: 12px;
+  padding: 6px 18px;
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .minimap-header {

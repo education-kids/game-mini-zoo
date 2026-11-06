@@ -135,7 +135,7 @@ html, body {
   inset: 0;
   width: 100%;
   height: 100%;
-  padding: 24px 32px;
+  padding: 70px 24px 20px 24px !important;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
@@ -328,68 +328,140 @@ html, body {
    ========================================================================== */
 .top-hud-container {
   position: absolute;
-  top: 12px;
-  left: 16px;
-  right: 16px;
-  z-index: 50;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  pointer-events: none;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(8, 26, 13, 0.96) 0%, rgba(12, 38, 20, 0.90) 100%);
+  border-bottom: 2px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  box-sizing: border-box;
+  backdrop-filter: blur(8px);
+}
+
+.hud-left-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hud-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(180deg, #78350F 0%, #451A03 100%);
+  border: 2px solid var(--color-gold);
+  color: var(--color-gold-light);
+  box-shadow: 0 3px 0 #2A1002, 0 4px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.1s ease, filter 0.1s ease;
+  min-height: 36px;
+}
+
+.hud-back-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.hud-back-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #2A1002 !important;
 }
 
 .hud-crystals-bar {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(11, 35, 18, 0.88);
-  border: 2px solid var(--color-wood-medium);
+  background: linear-gradient(180deg, #451A03 0%, #2A1002 100%);
+  border: 2px solid var(--color-gold);
   border-radius: 9999px;
-  padding: 4px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-  pointer-events: auto;
+  padding: 3px 10px;
+  box-shadow: 0 3px 0 #180800, inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .hud-crystal-slot {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1.5px dashed rgba(245, 158, 11, 0.4);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1.5px dashed rgba(245, 158, 11, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .hud-crystal-slot.crystal-collected {
-  background: rgba(245, 158, 11, 0.2);
-  border: 1.5px solid var(--color-gold);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  background: radial-gradient(circle, #F59E0B 0%, #78350F 85%);
+  border: 2px solid #FEF08A;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.85);
 }
 
 .hud-crystal-slot svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
-.floating-header-controls {
+.hud-center-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-realm-badge-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid var(--color-wood-medium);
+  border-radius: 9999px;
+  padding: 3px 14px 3px 5px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.quiz-kingdom-badge {
+  font-size: 0.88rem;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  color: #FFFFFF;
+  background-color: var(--color-karnivora);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.4px;
+}
+
+.quiz-level-indicator {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-gold-light);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.hud-right-section.floating-header-controls {
   display: flex;
   align-items: center;
   gap: 10px;
-  pointer-events: auto;
 }
 
 .btn-fullscreen-toggle,
 .btn-sound-toggle {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(180deg, #78350F 0%, #451A03 100%);
   border: 2px solid var(--color-gold);
   color: var(--color-gold-light);
-  box-shadow: 0 4px 0 #2A1002, 0 6px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 0 #2A1002, 0 4px 8px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -407,7 +479,7 @@ html, body {
 .btn-fullscreen-toggle:active,
 .btn-sound-toggle:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 #2A1002;
+  box-shadow: 0 1px 0 #2A1002 !important;
 }
 
 .btn-sound-toggle.sound-muted .sound-wave {
@@ -827,43 +899,20 @@ html, body {
    ========================================================================== */
 #screen-challenge {
   background: radial-gradient(circle at 50% 30%, #1B4323 0%, #0B2312 85%);
-  padding: 16px 28px;
+  padding: 68px 24px 16px 24px !important;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.quiz-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.quiz-kingdom-badge {
-  font-size: 0.95rem;
-  font-weight: 800;
-  padding: 4px 16px;
-  border-radius: 9999px;
-  color: #FFFFFF;
-  background-color: var(--color-karnivora);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-
-.quiz-level-indicator {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--color-gold-light);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
 /* MiniMap Horizontal Track */
 .minimap-wrapper {
-  background: rgba(7, 23, 11, 0.85);
+  background: rgba(7, 23, 11, 0.9);
   border-radius: 14px;
-  padding: 8px 18px;
-  border: 1.5px solid rgba(245, 158, 11, 0.3);
-  margin-bottom: 12px;
+  padding: 6px 18px;
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .minimap-header {
@@ -1328,28 +1377,50 @@ html, body {
   <div class="game-viewport">
     <div class="game-canvas-container slide-canvas-stage">
 
-      <!-- Top HUD: Crystal Inventory Slots & Floating Controls -->
+      <!-- ================================================================= -->
+      <!-- TOP HUD: UNIFIED GAME NAVIGATION & STATUS BAR                      -->
+      <!-- ================================================================= -->
       <header class="top-hud-container" id="game-hud" aria-label="HUD Permainan">
-        <div class="hud-crystals-bar" aria-label="Koleksi Kristal Ajaib">
-          <div id="slot-kristal-keberanian" class="hud-crystal-slot crystal-empty" title="Kristal Keberanian (Kerajaan Karnivora)" aria-label="Slot Kristal Keberanian"></div>
-          <div id="slot-kristal-kehidupan" class="hud-crystal-slot crystal-empty" title="Kristal Kehidupan (Kerajaan Herbivora)" aria-label="Slot Kristal Kehidupan"></div>
-          <div id="slot-kristal-harmoni" class="hud-crystal-slot crystal-empty" title="Kristal Harmoni (Kerajaan Omnivora)" aria-label="Slot Kristal Harmoni"></div>
+        <!-- Left Section: Navigation Back & Crystal Collection -->
+        <div class="hud-left-section">
+          <button id="btn-back-to-gate" class="hud-back-btn btn-3d-wood" type="button" aria-label="Kembali ke Gerbang" style="display:none;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Gerbang</span>
+          </button>
+          <div class="hud-crystals-bar" aria-label="Koleksi Kristal Ajaib">
+            <div id="slot-kristal-keberanian" class="hud-crystal-slot crystal-empty" title="Kristal Keberanian (Kerajaan Karnivora)" aria-label="Slot Kristal Keberanian"></div>
+            <div id="slot-kristal-kehidupan" class="hud-crystal-slot crystal-empty" title="Kristal Kehidupan (Kerajaan Herbivora)" aria-label="Slot Kristal Kehidupan"></div>
+            <div id="slot-kristal-harmoni" class="hud-crystal-slot crystal-empty" title="Kristal Harmoni (Kerajaan Omnivora)" aria-label="Slot Kristal Harmoni"></div>
+          </div>
         </div>
-        <div class="floating-header-controls">
+
+        <!-- Center Section: Active Kingdom Badge & Challenge Level Indicator -->
+        <div class="hud-center-section">
+          <div id="quiz-top-info" class="hud-realm-badge-group" style="display:none;">
+            <span id="quiz-kingdom-badge" class="quiz-kingdom-badge">Kerajaan Karnivora</span>
+            <span id="quiz-level-indicator" class="quiz-level-indicator">Tantangan 1 dari 5</span>
+          </div>
+        </div>
+
+        <!-- Right Section: Audio & Fullscreen Buttons -->
+        <div class="hud-right-section floating-header-controls">
           <button id="sound-toggle" class="btn-sound-toggle" type="button" aria-label="Pengaturan Suara" title="Pengaturan Suara">
-            <svg class="sound-wave" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="sound-wave" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
             </svg>
-            <svg class="sound-slash" style="display:none;" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="sound-slash" style="display:none;" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
               <line x1="23" y1="9" x2="17" y2="15"></line>
               <line x1="17" y1="9" x2="23" y2="15"></line>
             </svg>
           </button>
           <button id="btn-fullscreen" class="btn-fullscreen-toggle" type="button" aria-label="Layar Penuh" title="Layar Penuh">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
           </button>
@@ -1566,14 +1637,6 @@ html, body {
       <!-- SCREEN 5: CHALLENGE SCREEN (TANTANGAN SATWA / KUIS)               -->
       <!-- ================================================================= -->
       <section id="screen-challenge" class="game-screen screen" aria-label="Tantangan Satwa" style="display:none;">
-        <div class="quiz-top-bar">
-          <button id="btn-back-to-gate" class="pro-game-cta-btn btn-3d-wood" type="button" style="padding: 6px 16px; font-size: 0.95rem; min-height: 40px;">
-            <span>Gerbang</span>
-          </button>
-          <span id="quiz-kingdom-badge" class="quiz-kingdom-badge">Kerajaan Karnivora</span>
-          <span id="quiz-level-indicator" class="quiz-level-indicator">Tantangan 1 dari 5</span>
-        </div>
-
         <div id="quiz-minimap" class="minimap-wrapper"></div>
 
         <div class="quiz-main-stage">
@@ -4030,6 +4093,51 @@ html, body {
           }
         }
       });
+
+      // Update Top HUD Navigation and Realm Badge based on currentScreen
+      const backBtn = document.getElementById ? document.getElementById('btn-back-to-gate') : null;
+      const realmInfo = document.getElementById ? document.getElementById('quiz-top-info') : null;
+      const kingdomBadge = document.getElementById ? document.getElementById('quiz-kingdom-badge') : null;
+      const levelIndicator = document.getElementById ? document.getElementById('quiz-level-indicator') : null;
+      const kingdom = this.engine ? this.engine.getCurrentKingdom() : null;
+
+      if (backBtn && backBtn.style) {
+        if (this.currentScreen === 'screen-challenge') {
+          backBtn.style.display = 'inline-flex';
+          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+          if (span) span.textContent = 'Gerbang';
+        } else if (this.currentScreen === 'screen-kingdom-gate') {
+          backBtn.style.display = 'inline-flex';
+          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+          if (span) span.textContent = 'Peta';
+        } else {
+          backBtn.style.display = 'none';
+        }
+      }
+
+      if (realmInfo && realmInfo.style) {
+        if (this.currentScreen === 'screen-challenge') {
+          realmInfo.style.display = 'inline-flex';
+          if (kingdomBadge && kingdom) {
+            kingdomBadge.textContent = kingdom.name;
+            if (kingdomBadge.style) kingdomBadge.style.backgroundColor = kingdom.color;
+          }
+          if (levelIndicator) {
+            levelIndicator.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+          }
+        } else if (this.currentScreen === 'screen-kingdom-gate') {
+          realmInfo.style.display = 'inline-flex';
+          if (kingdomBadge && kingdom) {
+            kingdomBadge.textContent = kingdom.name;
+            if (kingdomBadge.style) kingdomBadge.style.backgroundColor = kingdom.color;
+          }
+          if (levelIndicator) {
+            levelIndicator.textContent = 'Gerbang Masuk';
+          }
+        } else {
+          realmInfo.style.display = 'none';
+        }
+      }
     }
 
     _updateSplashScreen() {
@@ -4341,7 +4449,14 @@ html, body {
     if (defaultEngine.hasSavedProgress()) {
       defaultEngine.loadProgress();
     }
-    defaultRouter.navigateTo('screen-splash');
+    let initialScreen = 'screen-splash';
+    if (typeof window !== 'undefined' && window.location && window.location.hash) {
+      const hashScreen = window.location.hash.replace('#', '');
+      if (defaultRouter.screens.includes(hashScreen)) {
+        initialScreen = hashScreen;
+      }
+    }
+    defaultRouter.navigateTo(initialScreen);
   }
 
   // Autostart in browser if document is ready

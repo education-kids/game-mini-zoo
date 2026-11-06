@@ -863,6 +863,51 @@
           }
         }
       });
+
+      // Update Top HUD Navigation and Realm Badge based on currentScreen
+      const backBtn = document.getElementById ? document.getElementById('btn-back-to-gate') : null;
+      const realmInfo = document.getElementById ? document.getElementById('quiz-top-info') : null;
+      const kingdomBadge = document.getElementById ? document.getElementById('quiz-kingdom-badge') : null;
+      const levelIndicator = document.getElementById ? document.getElementById('quiz-level-indicator') : null;
+      const kingdom = this.engine ? this.engine.getCurrentKingdom() : null;
+
+      if (backBtn && backBtn.style) {
+        if (this.currentScreen === 'screen-challenge') {
+          backBtn.style.display = 'inline-flex';
+          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+          if (span) span.textContent = 'Gerbang';
+        } else if (this.currentScreen === 'screen-kingdom-gate') {
+          backBtn.style.display = 'inline-flex';
+          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+          if (span) span.textContent = 'Peta';
+        } else {
+          backBtn.style.display = 'none';
+        }
+      }
+
+      if (realmInfo && realmInfo.style) {
+        if (this.currentScreen === 'screen-challenge') {
+          realmInfo.style.display = 'inline-flex';
+          if (kingdomBadge && kingdom) {
+            kingdomBadge.textContent = kingdom.name;
+            if (kingdomBadge.style) kingdomBadge.style.backgroundColor = kingdom.color;
+          }
+          if (levelIndicator) {
+            levelIndicator.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+          }
+        } else if (this.currentScreen === 'screen-kingdom-gate') {
+          realmInfo.style.display = 'inline-flex';
+          if (kingdomBadge && kingdom) {
+            kingdomBadge.textContent = kingdom.name;
+            if (kingdomBadge.style) kingdomBadge.style.backgroundColor = kingdom.color;
+          }
+          if (levelIndicator) {
+            levelIndicator.textContent = 'Gerbang Masuk';
+          }
+        } else {
+          realmInfo.style.display = 'none';
+        }
+      }
     }
 
     _updateSplashScreen() {
@@ -1174,7 +1219,14 @@
     if (defaultEngine.hasSavedProgress()) {
       defaultEngine.loadProgress();
     }
-    defaultRouter.navigateTo('screen-splash');
+    let initialScreen = 'screen-splash';
+    if (typeof window !== 'undefined' && window.location && window.location.hash) {
+      const hashScreen = window.location.hash.replace('#', '');
+      if (defaultRouter.screens.includes(hashScreen)) {
+        initialScreen = hashScreen;
+      }
+    }
+    defaultRouter.navigateTo(initialScreen);
   }
 
   // Autostart in browser if document is ready
