@@ -502,10 +502,11 @@
         clueEl.textContent = level.clue;
       }
 
-      // Level indicator
+      // Level indicator (clamped to max 5)
       const levelIndEl = document.getElementById('quiz-level-indicator');
       if (levelIndEl) {
-        levelIndEl.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+        const lvlNum = Math.min(5, Math.max(1, this.engine.currentLevelIndex + 1));
+        levelIndEl.textContent = `Tantangan ${lvlNum} dari 5`;
       }
 
       // Kingdom badge
@@ -583,8 +584,14 @@
 
     submitAnswer() {
       if (this.isModalOpen || !this.engine) return;
-      const key = this.selectedOptionKey || 'B';
-      this.handleOptionSelect(key);
+      if (!this.selectedOptionKey) {
+        if (window.navigationRouter && typeof window.navigationRouter.showToast === 'function') {
+          window.navigationRouter.showToast('Pilih salah satu jawaban terlebih dahulu!');
+        }
+        if (this.sfx) this.sfx.play('wrong');
+        return;
+      }
+      this.handleOptionSelect(this.selectedOptionKey);
     }
 
     showFeedbackModal({ isCorrect, title, text, animal }) {
@@ -1034,7 +1041,8 @@
             if (kingdomBadge.style) kingdomBadge.style.backgroundColor = kingdom.color;
           }
           if (levelIndicator) {
-            levelIndicator.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+            const lvlNum = Math.min(5, Math.max(1, this.engine.currentLevelIndex + 1));
+            levelIndicator.textContent = `Tantangan ${lvlNum} dari 5`;
           }
         } else if (this.currentScreen === 'screen-kingdom-gate') {
           realmInfo.style.display = 'inline-flex';
@@ -1445,12 +1453,8 @@
 
           case 'btn-quiz-submit':
           case 'quiz-submit-hotspot':
-            if (this.quizController) {
-              if (this.quizController.submitAnswer) {
-                this.quizController.submitAnswer();
-              } else {
-                this.quizController.handleOptionSelect('B');
-              }
+            if (this.quizController && typeof this.quizController.submitAnswer === 'function') {
+              this.quizController.submitAnswer();
             }
             break;
 

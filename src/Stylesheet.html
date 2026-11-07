@@ -2130,14 +2130,21 @@ header[style*="display:none"] {
   left: auto !important;
 }
 
-#screen-splash #btn-start-adventure:hover {
+#screen-splash #btn-start-adventure:hover,
+#screen-splash #btn-start-adventure:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #screen-splash #btn-start-adventure:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 /* 2. Instructions Screen: Hotspot over "Ayo Mulai!" */
@@ -2165,18 +2172,28 @@ header[style*="display:none"] {
   border-radius: 9999px !important;
   cursor: pointer !important;
   transform: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 #screen-instructions #btn-start-mission:hover,
-#btn-start-mission.slide-hotspot-pill:hover {
+#btn-start-mission.slide-hotspot-pill:hover,
+#screen-instructions #btn-start-mission:focus-visible,
+#btn-start-mission.slide-hotspot-pill:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #screen-instructions #btn-start-mission:active,
 #btn-start-mission.slide-hotspot-pill:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 
@@ -2252,6 +2269,8 @@ header[style*="display:none"] {
 }
 
 #btn-map-quick-start {
+  position: absolute !important;
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   background: transparent !important;
@@ -2259,15 +2278,28 @@ header[style*="display:none"] {
   box-shadow: none !important;
   border-radius: 9999px !important;
   cursor: pointer !important;
+  transform: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  touch-action: manipulation !important;
 }
 
-#btn-map-quick-start:hover {
+#btn-map-quick-start:hover,
+#btn-map-quick-start:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #btn-map-quick-start:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 /* 4. Kingdom Gate Screen: Hotspot over "MASUK KERAJAAN" */
@@ -2300,15 +2332,23 @@ header[style*="display:none"] {
 }
 
 #screen-kingdom-gate #btn-start-challenge:hover,
-#btn-start-challenge.slide-hotspot-pill:hover {
+#btn-start-challenge.slide-hotspot-pill:hover,
+#screen-kingdom-gate #btn-start-challenge:focus-visible,
+#btn-start-challenge.slide-hotspot-pill:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #screen-kingdom-gate #btn-start-challenge:active,
 #btn-start-challenge.slide-hotspot-pill:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 #btn-back-to-map,
@@ -2338,7 +2378,7 @@ header[style*="display:none"] {
   cursor: pointer !important;
   pointer-events: auto !important;
   background: transparent !important;
-  border: 3.5px solid transparent !important;
+  border: none !important;
   border-radius: 9999px !important;
   box-shadow: none !important;
   transform: none !important;
@@ -2359,32 +2399,35 @@ header[style*="display:none"] {
   display: none !important;
 }
 
-.btn-quiz-option:hover {
-  background: rgba(250, 204, 21, 0.12) !important;
-  border-color: rgba(250, 204, 21, 0.5) !important;
-  box-shadow: 0 0 16px rgba(250, 204, 21, 0.35) !important;
+.btn-quiz-option:hover,
+.btn-quiz-option:focus-visible {
+  background: rgba(250, 204, 21, 0.16) !important;
+  border: none !important;
+  box-shadow: inset 0 0 12px rgba(250, 204, 21, 0.4), 0 0 14px rgba(250, 204, 21, 0.25) !important;
   transform: none !important;
+  outline: none !important;
 }
 
 .btn-quiz-option.active,
 .btn-quiz-option.selected {
-  border-color: #F59E0B !important;
-  background: rgba(245, 158, 11, 0.22) !important;
-  box-shadow: 0 0 18px rgba(245, 158, 11, 0.75), inset 0 0 8px rgba(245, 158, 11, 0.25) !important;
+  border: none !important;
+  background: rgba(245, 158, 11, 0.28) !important;
+  box-shadow: inset 0 0 14px rgba(245, 158, 11, 0.7), 0 0 16px rgba(245, 158, 11, 0.45) !important;
   transform: none !important;
+  outline: none !important;
 }
 
 .btn-quiz-option.correct {
-  border-color: #10B981 !important;
-  background: rgba(16, 185, 129, 0.25) !important;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(16, 185, 129, 0.3) !important;
+  border: none !important;
+  background: rgba(16, 185, 129, 0.28) !important;
+  box-shadow: inset 0 0 16px rgba(16, 185, 129, 0.75), 0 0 18px rgba(16, 185, 129, 0.5) !important;
   transform: none !important;
 }
 
 .btn-quiz-option.wrong {
-  border-color: #EF4444 !important;
-  background: rgba(239, 68, 68, 0.25) !important;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(239, 68, 68, 0.3) !important;
+  border: none !important;
+  background: rgba(239, 68, 68, 0.28) !important;
+  box-shadow: inset 0 0 16px rgba(239, 68, 68, 0.75), 0 0 18px rgba(239, 68, 68, 0.5) !important;
   animation: shakeWrong 0.35s ease-in-out !important;
   transform: none !important;
 }

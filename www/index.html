@@ -2144,14 +2144,21 @@ header[style*="display:none"] {
   left: auto !important;
 }
 
-#screen-splash #btn-start-adventure:hover {
+#screen-splash #btn-start-adventure:hover,
+#screen-splash #btn-start-adventure:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #screen-splash #btn-start-adventure:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 /* 2. Instructions Screen: Hotspot over "Ayo Mulai!" */
@@ -2179,18 +2186,28 @@ header[style*="display:none"] {
   border-radius: 9999px !important;
   cursor: pointer !important;
   transform: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 #screen-instructions #btn-start-mission:hover,
-#btn-start-mission.slide-hotspot-pill:hover {
+#btn-start-mission.slide-hotspot-pill:hover,
+#screen-instructions #btn-start-mission:focus-visible,
+#btn-start-mission.slide-hotspot-pill:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #screen-instructions #btn-start-mission:active,
 #btn-start-mission.slide-hotspot-pill:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 
@@ -2266,6 +2283,8 @@ header[style*="display:none"] {
 }
 
 #btn-map-quick-start {
+  position: absolute !important;
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   background: transparent !important;
@@ -2273,15 +2292,28 @@ header[style*="display:none"] {
   box-shadow: none !important;
   border-radius: 9999px !important;
   cursor: pointer !important;
+  transform: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  touch-action: manipulation !important;
 }
 
-#btn-map-quick-start:hover {
+#btn-map-quick-start:hover,
+#btn-map-quick-start:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #btn-map-quick-start:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 /* 4. Kingdom Gate Screen: Hotspot over "MASUK KERAJAAN" */
@@ -2314,15 +2346,23 @@ header[style*="display:none"] {
 }
 
 #screen-kingdom-gate #btn-start-challenge:hover,
-#btn-start-challenge.slide-hotspot-pill:hover {
+#btn-start-challenge.slide-hotspot-pill:hover,
+#screen-kingdom-gate #btn-start-challenge:focus-visible,
+#btn-start-challenge.slide-hotspot-pill:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.4) !important;
+  transform: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 #screen-kingdom-gate #btn-start-challenge:active,
 #btn-start-challenge.slide-hotspot-pill:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  transform: none !important;
+  border: none !important;
 }
 
 #btn-back-to-map,
@@ -2352,7 +2392,7 @@ header[style*="display:none"] {
   cursor: pointer !important;
   pointer-events: auto !important;
   background: transparent !important;
-  border: 3.5px solid transparent !important;
+  border: none !important;
   border-radius: 9999px !important;
   box-shadow: none !important;
   transform: none !important;
@@ -2373,32 +2413,35 @@ header[style*="display:none"] {
   display: none !important;
 }
 
-.btn-quiz-option:hover {
-  background: rgba(250, 204, 21, 0.12) !important;
-  border-color: rgba(250, 204, 21, 0.5) !important;
-  box-shadow: 0 0 16px rgba(250, 204, 21, 0.35) !important;
+.btn-quiz-option:hover,
+.btn-quiz-option:focus-visible {
+  background: rgba(250, 204, 21, 0.16) !important;
+  border: none !important;
+  box-shadow: inset 0 0 12px rgba(250, 204, 21, 0.4), 0 0 14px rgba(250, 204, 21, 0.25) !important;
   transform: none !important;
+  outline: none !important;
 }
 
 .btn-quiz-option.active,
 .btn-quiz-option.selected {
-  border-color: #F59E0B !important;
-  background: rgba(245, 158, 11, 0.22) !important;
-  box-shadow: 0 0 18px rgba(245, 158, 11, 0.75), inset 0 0 8px rgba(245, 158, 11, 0.25) !important;
+  border: none !important;
+  background: rgba(245, 158, 11, 0.28) !important;
+  box-shadow: inset 0 0 14px rgba(245, 158, 11, 0.7), 0 0 16px rgba(245, 158, 11, 0.45) !important;
   transform: none !important;
+  outline: none !important;
 }
 
 .btn-quiz-option.correct {
-  border-color: #10B981 !important;
-  background: rgba(16, 185, 129, 0.25) !important;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(16, 185, 129, 0.3) !important;
+  border: none !important;
+  background: rgba(16, 185, 129, 0.28) !important;
+  box-shadow: inset 0 0 16px rgba(16, 185, 129, 0.75), 0 0 18px rgba(16, 185, 129, 0.5) !important;
   transform: none !important;
 }
 
 .btn-quiz-option.wrong {
-  border-color: #EF4444 !important;
-  background: rgba(239, 68, 68, 0.25) !important;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(239, 68, 68, 0.3) !important;
+  border: none !important;
+  background: rgba(239, 68, 68, 0.28) !important;
+  box-shadow: inset 0 0 16px rgba(239, 68, 68, 0.75), 0 0 18px rgba(239, 68, 68, 0.5) !important;
   animation: shakeWrong 0.35s ease-in-out !important;
   transform: none !important;
 }
@@ -2992,7 +3035,7 @@ header[style*="display:none"] {
 
         <!-- Bottom-Right Quick Start Hotspot -->
         <div style="position: absolute; right: 2.5%; bottom: 2.5%; width: 25%; height: 14%; z-index: 30;">
-          <button id="btn-map-quick-start" class="pro-game-cta-btn btn-3d-green hotspot-gate-start btn-centered slide-hotspot-pill" type="button" aria-label="Lanjutkan Tantangan">
+          <button id="btn-map-quick-start" class="pro-game-cta-btn slide-hotspot-pill" type="button" aria-label="Lanjutkan Tantangan">
             <span class="visually-hidden">Lanjutkan Tantangan</span>
           </button>
         </div>
@@ -5268,10 +5311,11 @@ header[style*="display:none"] {
         clueEl.textContent = level.clue;
       }
 
-      // Level indicator
+      // Level indicator (clamped to max 5)
       const levelIndEl = document.getElementById('quiz-level-indicator');
       if (levelIndEl) {
-        levelIndEl.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+        const lvlNum = Math.min(5, Math.max(1, this.engine.currentLevelIndex + 1));
+        levelIndEl.textContent = `Tantangan ${lvlNum} dari 5`;
       }
 
       // Kingdom badge
@@ -5349,8 +5393,14 @@ header[style*="display:none"] {
 
     submitAnswer() {
       if (this.isModalOpen || !this.engine) return;
-      const key = this.selectedOptionKey || 'B';
-      this.handleOptionSelect(key);
+      if (!this.selectedOptionKey) {
+        if (window.navigationRouter && typeof window.navigationRouter.showToast === 'function') {
+          window.navigationRouter.showToast('Pilih salah satu jawaban terlebih dahulu!');
+        }
+        if (this.sfx) this.sfx.play('wrong');
+        return;
+      }
+      this.handleOptionSelect(this.selectedOptionKey);
     }
 
     showFeedbackModal({ isCorrect, title, text, animal }) {
@@ -5800,7 +5850,8 @@ header[style*="display:none"] {
             if (kingdomBadge.style) kingdomBadge.style.backgroundColor = kingdom.color;
           }
           if (levelIndicator) {
-            levelIndicator.textContent = `Tantangan ${this.engine.currentLevelIndex + 1} dari 5`;
+            const lvlNum = Math.min(5, Math.max(1, this.engine.currentLevelIndex + 1));
+            levelIndicator.textContent = `Tantangan ${lvlNum} dari 5`;
           }
         } else if (this.currentScreen === 'screen-kingdom-gate') {
           realmInfo.style.display = 'inline-flex';
@@ -6211,12 +6262,8 @@ header[style*="display:none"] {
 
           case 'btn-quiz-submit':
           case 'quiz-submit-hotspot':
-            if (this.quizController) {
-              if (this.quizController.submitAnswer) {
-                this.quizController.submitAnswer();
-              } else {
-                this.quizController.handleOptionSelect('B');
-              }
+            if (this.quizController && typeof this.quizController.submitAnswer === 'function') {
+              this.quizController.submitAnswer();
             }
             break;
 
@@ -6470,7 +6517,7 @@ header[style*="display:none"] {
   <script>
     if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=4').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=5').then((reg) => {
           reg.update();
         }).catch(() => {});
       });
