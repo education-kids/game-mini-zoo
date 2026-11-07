@@ -67,6 +67,20 @@ function prepareWww() {
     copyDirRecursive(minimapsSrc, minimapsDest);
   }
 
+  // Copy assets/qr (Assemblr Edu AR 3D QR Codes)
+  const qrSrc = path.join(ROOT_DIR, 'assets', 'qr');
+  const qrDest = path.join(WWW_DIR, 'assets', 'qr');
+  if (fs.existsSync(qrSrc)) {
+    copyDirRecursive(qrSrc, qrDest);
+  }
+
+  // Copy assets/audio (In-game background music)
+  const audioSrc = path.join(ROOT_DIR, 'assets', 'audio');
+  const audioDest = path.join(WWW_DIR, 'assets', 'audio');
+  if (fs.existsSync(audioSrc)) {
+    copyDirRecursive(audioSrc, audioDest);
+  }
+
   console.log(`[build-www] Successfully prepared clean web assets in: ${WWW_DIR}`);
 }
 

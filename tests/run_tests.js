@@ -388,6 +388,25 @@ describe('GameData: schema and 15 level definitions verified', () => {
     assert.ok(stats.size > 10000, 'GameData.html must contain full data and SVGs (> 10KB)');
     assert.ok(stats.size < 200000, `GameData.html must be lightweight (< 200KB), got ${stats.size} bytes`);
   });
+
+  it('All 15 levels define valid qrImage pointing to existing files in assets/qr', () => {
+    const data = loadGameDataModule();
+    assert.strictEqual(data.levels.length, 15);
+    data.levels.forEach(level => {
+      assert.ok(level.qrImage, `Level ${level.id} must define qrImage`);
+      assert.ok(level.qrImage.startsWith('assets/qr/'), `Level ${level.id} qrImage must start with assets/qr/`);
+      const fullPath = path.join(ROOT_DIR, level.qrImage);
+      assert.ok(fs.existsSync(fullPath), `QR image file ${fullPath} must exist on disk`);
+    });
+  });
+
+  it('GAME_DATA.getAnimalQr returns correct QR image path', () => {
+    const data = loadGameDataModule();
+    assert.strictEqual(typeof data.getAnimalQr, 'function', 'GAME_DATA.getAnimalQr must be a function');
+    assert.strictEqual(data.getAnimalQr('singa'), 'assets/qr/lion.png');
+    assert.strictEqual(data.getAnimalQr('rusa'), 'assets/qr/deer.png');
+    assert.strictEqual(data.getAnimalQr('monyet'), 'assets/qr/monkey.png');
+  });
 });
 
 // =============================================================================
@@ -703,6 +722,14 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
 
     // Playing while muted should no-op safely
     assert.doesNotThrow(() => sfx.play('correct'));
+
+    // In-game background music (BGM) API verification
+    assert.strictEqual(typeof sfx.startBgm, 'function', 'Must provide startBgm method');
+    assert.strictEqual(typeof sfx.pauseBgm, 'function', 'Must provide pauseBgm method');
+    assert.strictEqual(typeof sfx.resumeBgm, 'function', 'Must provide resumeBgm method');
+    assert.doesNotThrow(() => sfx.startBgm(), 'startBgm should not throw');
+    assert.doesNotThrow(() => sfx.pauseBgm(), 'pauseBgm should not throw');
+    assert.doesNotThrow(() => sfx.resumeBgm(), 'resumeBgm should not throw');
 
     sfx.toggleMute();
     assert.strictEqual(sfx.isMuted(), false);
@@ -1281,6 +1308,8 @@ describe('Task 5: 16:9 SPA HTML Structure (src/Index.html)', () => {
     assert.ok(html.includes('id="feedback-modal"'), 'Must define #feedback-modal');
     assert.ok(html.includes('id="feedback-title"'), 'Must define #feedback-title');
     assert.ok(html.includes('id="feedback-text"'), 'Must define #feedback-text');
+    assert.ok(html.includes('id="feedback-qr-container"'), 'Must define #feedback-qr-container');
+    assert.ok(html.includes('id="feedback-qr-image"'), 'Must define #feedback-qr-image');
     assert.ok(html.includes('id="btn-feedback-retry"'), 'Must define #btn-feedback-retry');
     assert.ok(html.includes('id="btn-feedback-continue"'), 'Must define #btn-feedback-continue');
   });

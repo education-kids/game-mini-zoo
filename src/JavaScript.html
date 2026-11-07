@@ -221,23 +221,80 @@
       this.ctx = null;
       this.muted = false;
       this.isInitialized = false;
+      this.bgmAudio = null;
+      this.bgmStarted = false;
+      this.bgmVolume = 0.45;
     }
 
     init() {
-      if (this.isInitialized && this.ctx) return;
+      if (!this.isInitialized || !this.ctx) {
+        try {
+          const AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            this.isInitialized = true;
+          }
+        } catch (e) {
+          console.warn('Web Audio API unavailable:', e);
+        }
+      }
+      this.initBgm();
+    }
+
+    initBgm() {
+      if (typeof Audio === 'undefined') return;
+      if (!this.bgmAudio) {
+        try {
+          this.bgmAudio = new Audio('assets/audio/ingame_bgm.mp3');
+          this.bgmAudio.loop = true;
+          this.bgmAudio.volume = this.bgmVolume;
+          this.bgmAudio.preload = 'auto';
+        } catch (e) {
+          console.warn('BGM Audio init error:', e);
+        }
+      }
+    }
+
+    startBgm() {
+      if (this.muted) return;
+      this.initBgm();
+      if (!this.bgmAudio) return;
+      if (this.bgmStarted && !this.bgmAudio.paused) return;
+
       try {
-        const AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
-        if (AudioCtx) {
-          this.ctx = new AudioCtx();
-          this.isInitialized = true;
+        const p = this.bgmAudio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            this.bgmStarted = true;
+          }).catch(() => {
+            this.bgmStarted = false;
+          });
         }
       } catch (e) {
-        console.warn('Web Audio API unavailable:', e);
+        this.bgmStarted = false;
       }
+    }
+
+    pauseBgm() {
+      if (this.bgmAudio) {
+        try {
+          this.bgmAudio.pause();
+        } catch (e) {}
+      }
+    }
+
+    resumeBgm() {
+      if (this.muted) return;
+      this.startBgm();
     }
 
     toggleMute() {
       this.muted = !this.muted;
+      if (this.muted) {
+        this.pauseBgm();
+      } else {
+        this.resumeBgm();
+      }
       return this.muted;
     }
 
@@ -630,6 +687,23 @@
         btnRetry.style.display = isCorrect ? 'none' : 'inline-flex';
       }
 
+      // Assemblr Edu AR 3D QR Code Display
+      const qrContainer = document.getElementById('feedback-qr-container');
+      const qrImage = document.getElementById('feedback-qr-image');
+      if (qrContainer) {
+        if (isCorrect && animal) {
+          const key = (animal.id || animal.assetKey || '').toLowerCase();
+          const qrSrc = animal.qrImage || (typeof GAME_DATA !== 'undefined' && GAME_DATA.getAnimalQr ? GAME_DATA.getAnimalQr(key) : '') || `assets/qr/${key}.png`;
+          if (qrImage && qrSrc) {
+            qrImage.src = qrSrc;
+            qrImage.alt = `Assemblr Edu AR QR Code - ${animal.name || key}`;
+          }
+          qrContainer.style.display = 'flex';
+        } else {
+          qrContainer.style.display = 'none';
+        }
+      }
+
       const modals = [
         document.getElementById('modal-feedback'),
         document.getElementById('feedback-modal')
@@ -669,6 +743,11 @@
         if (m.style) m.style.display = 'none';
         if (m.setAttribute) m.setAttribute('aria-hidden', 'true');
       });
+
+      const qrContainer = document.getElementById('feedback-qr-container');
+      if (qrContainer && qrContainer.style) {
+        qrContainer.style.display = 'none';
+      }
     }
 
     handleContinue() {
@@ -1005,31 +1084,32 @@
       const kingdom = this.engine ? this.engine.getCurrentKingdom() : null;
 
       if (backBtn && backBtn.style) {
-        backBtn.style.display = 'inline-flex';
-        const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
         if (this.currentScreen === 'screen-splash') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Keluar dari Aplikasi');
-        } else if (this.currentScreen === 'screen-instructions') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Menu Awal');
-        } else if (this.currentScreen === 'screen-main-map') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Petunjuk Permainan');
-        } else if (this.currentScreen === 'screen-kingdom-gate') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
-        } else if (this.currentScreen === 'screen-challenge') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang Kerajaan');
-        } else if (this.currentScreen === 'screen-kingdom-reward') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
-        } else if (this.currentScreen === 'screen-final-victory') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
-        } else {
           backBtn.style.display = 'none';
+        } else {
+          backBtn.style.display = 'inline-flex';
+          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+          if (this.currentScreen === 'screen-instructions') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Menu Awal');
+          } else if (this.currentScreen === 'screen-main-map') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Petunjuk Permainan');
+          } else if (this.currentScreen === 'screen-kingdom-gate') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+          } else if (this.currentScreen === 'screen-challenge') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang Kerajaan');
+          } else if (this.currentScreen === 'screen-kingdom-reward') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+          } else if (this.currentScreen === 'screen-final-victory') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+          } else {
+            backBtn.style.display = 'none';
+          }
         }
       }
 
@@ -1372,6 +1452,16 @@
         // Click sound for buttons (except quiz options which have their own sound logic)
         if (target.tagName === 'BUTTON' && !target.classList.contains('btn-quiz-option')) {
           if (this.sfx) this.sfx.play('click');
+        }
+
+        // Start / Unlock in-game BGM on first user interaction
+        if (this.sfx) {
+          if (!this.sfx.isInitialized) {
+            this.sfx.init();
+          }
+          if (!this.sfx.bgmStarted && !this.sfx.isMuted()) {
+            this.sfx.startBgm();
+          }
         }
 
         // Handle Option Select

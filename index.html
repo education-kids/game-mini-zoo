@@ -655,12 +655,13 @@ html, body {
 .session-resume-box,
 #session-resume-box {
   display: none;
-  flex-direction: row;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: clamp(8px, 1.8vw, 16px);
   width: auto;
-  max-width: 90%;
+  max-width: 95%;
   position: absolute;
   top: 76%;
   bottom: auto;
@@ -1518,12 +1519,110 @@ html, body {
   color: var(--color-text-dark);
   border: 4.5px solid var(--color-wood-medium);
   border-radius: 24px;
-  padding: 24px 30px;
+  padding: 20px 24px;
   max-width: 580px;
+  max-height: 94vh;
+  overflow-y: auto;
   width: 100%;
   text-align: center;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7), 0 0 0 4px var(--color-gold);
   animation: modalPopIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Assemblr Edu AR 3D QR Code Box */
+.feedback-qr-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0 16px 0;
+  width: 100%;
+}
+
+.feedback-qr-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: #FEF9C3;
+  border: 2px dashed #D97706;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(120, 53, 15, 0.12);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.feedback-qr-img-wrap {
+  width: 95px;
+  height: 95px;
+  min-width: 95px;
+  background: #FFFFFF;
+  border: 2px solid #F59E0B;
+  border-radius: 12px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.feedback-qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.feedback-qr-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 3px;
+  flex: 1;
+}
+
+.feedback-qr-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: linear-gradient(180deg, #16A34A 0%, #15803D 100%);
+  color: #FFFFFF;
+  font-family: var(--font-game);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 4px rgba(21, 128, 61, 0.3);
+}
+
+.qr-label-title {
+  font-family: var(--font-game);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #451A03;
+  line-height: 1.25;
+}
+
+.qr-label-sub {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #78350F;
+  line-height: 1.35;
+}
+
+@media (max-width: 480px) {
+  .feedback-qr-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 10px;
+  }
+  .feedback-qr-label {
+    align-items: center;
+    text-align: center;
+  }
 }
 
 @keyframes modalPopIn {
@@ -3150,6 +3249,20 @@ header[style*="display:none"] {
           <h3 id="feedback-title" class="feedback-title">Hebat! Jawaban Benar!</h3>
           <div id="feedback-text" class="feedback-text">Pengetahuan Satwa</div>
           <div id="feedback-animal-info" class="feedback-animal-info"></div>
+          
+          <!-- Assemblr Edu AR 3D QR Code Box -->
+          <div id="feedback-qr-container" class="feedback-qr-container" style="display:none;">
+            <div class="feedback-qr-card">
+              <div class="feedback-qr-img-wrap">
+                <img id="feedback-qr-image" class="feedback-qr-image" src="assets/qr/lion.png" alt="Assemblr Edu AR QR Code" />
+              </div>
+              <div class="feedback-qr-label">
+                <span class="feedback-qr-badge">Assemblr Edu AR 3D</span>
+                <span class="qr-label-title">Lihat Satwa dalam 3D Nyata!</span>
+                <span class="qr-label-sub">Pindai QR Code ini menggunakan aplikasi Assemblr Edu untuk memunculkan model satwa 3D interaktif.</span>
+              </div>
+            </div>
+          </div>
           <div class="feedback-actions">
             <button id="btn-feedback-retry" class="pro-game-cta-btn btn-3d-wood" type="button" style="display:none;">
               <span>Coba Lagi</span>
@@ -3366,6 +3479,7 @@ header[style*="display:none"] {
       answerLabel: 'Singa',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah singa. Aku termasuk hewan karnivora karena memakan daging. Surai lebat di sekitar kepala dan leher merupakan salah satu ciri khas singa jantan.',
       assetKey: 'singa',
+      qrImage: 'assets/qr/lion.png',
       slideImage: 'assets/slides/karnivora_1.jpg',
       minimapImage: 'assets/minimaps/karnivora_minimap_1.jpg'
     },
@@ -3387,6 +3501,7 @@ header[style*="display:none"] {
       answerLabel: 'Harimau',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah harimau. Aku termasuk hewan karnivora karena memakan daging. Belang pada tubuhku menjadi salah satu ciri khas yang mudah dikenali.',
       assetKey: 'harimau',
+      qrImage: 'assets/qr/tiger.png',
       slideImage: 'assets/slides/karnivora_2.jpg',
       minimapImage: 'assets/minimaps/karnivora_minimap_2.jpg'
     },
@@ -3408,6 +3523,7 @@ header[style*="display:none"] {
       answerLabel: 'Buaya',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah buaya. Aku termasuk hewan karnivora karena memakan hewan lain. Rahangku kuat dan gigi tajam membantuku menangkap mangsa.',
       assetKey: 'buaya',
+      qrImage: 'assets/qr/croc.png',
       slideImage: 'assets/slides/karnivora_3.jpg',
       minimapImage: 'assets/minimaps/karnivora_minimap_3.jpg'
     },
@@ -3429,6 +3545,7 @@ header[style*="display:none"] {
       answerLabel: 'Serigala',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah serigala. Aku termasuk hewan karnivora. Aku sering hidup dalam kelompok dan menggunakan lolongan untuk berkomunikasi.',
       assetKey: 'serigala',
+      qrImage: 'assets/qr/wolf.png',
       slideImage: 'assets/slides/karnivora_4.jpg',
       minimapImage: 'assets/minimaps/karnivora_minimap_4.jpg'
     },
@@ -3450,6 +3567,7 @@ header[style*="display:none"] {
       answerLabel: 'Hiu',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah hiu. Aku termasuk hewan karnivora karena memakan hewan laut lain. Aku bernapas menggunakan insang dan memiliki banyak gigi.',
       assetKey: 'hiu',
+      qrImage: 'assets/qr/shark.png',
       slideImage: 'assets/slides/karnivora_5.jpg',
       minimapImage: 'assets/minimaps/karnivora_minimap_5.jpg'
     },
@@ -3473,6 +3591,7 @@ header[style*="display:none"] {
       answerLabel: 'Sapi',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah sapi. Aku termasuk hewan herbivora karena memakan tumbuhan seperti rumput. Susuku juga dapat diolah menjadi berbagai produk makanan.',
       assetKey: 'sapi',
+      qrImage: 'assets/qr/cow.png',
       slideImage: 'assets/slides/herbivora_1.jpg',
       minimapImage: 'assets/minimaps/herbivora_minimap_1.jpg'
     },
@@ -3494,6 +3613,7 @@ header[style*="display:none"] {
       answerLabel: 'Kelinci',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah kelinci. Aku termasuk hewan herbivora karena memakan tumbuhan seperti rumput dan berbagai jenis sayuran.',
       assetKey: 'kelinci',
+      qrImage: 'assets/qr/rabbit.png',
       slideImage: 'assets/slides/herbivora_2.jpg',
       minimapImage: 'assets/minimaps/herbivora_minimap_2.jpg'
     },
@@ -3515,6 +3635,7 @@ header[style*="display:none"] {
       answerLabel: 'Jerapah',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah jerapah. Aku termasuk hewan herbivora karena memakan tumbuhan. Leherku yang panjang membantuku menjangkau daun di pohon yang tinggi.',
       assetKey: 'jerapah',
+      qrImage: 'assets/qr/giraffe.png',
       slideImage: 'assets/slides/herbivora_3.jpg',
       minimapImage: 'assets/minimaps/herbivora_minimap_3.jpg'
     },
@@ -3536,6 +3657,7 @@ header[style*="display:none"] {
       answerLabel: 'Gajah',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah gajah. Aku termasuk hewan herbivora karena memakan tumbuhan. Belalaiku membantuku mengambil makanan dan minum.',
       assetKey: 'gajah',
+      qrImage: 'assets/qr/elepanth.png',
       slideImage: 'assets/slides/herbivora_4.jpg',
       minimapImage: 'assets/minimaps/herbivora_minimap_4.jpg'
     },
@@ -3557,6 +3679,7 @@ header[style*="display:none"] {
       answerLabel: 'Rusa',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah rusa. Aku termasuk hewan herbivora karena memakan tumbuhan seperti rumput, daun, dan tunas.',
       assetKey: 'rusa',
+      qrImage: 'assets/qr/deer.png',
       slideImage: 'assets/slides/herbivora_5.jpg',
       minimapImage: 'assets/minimaps/herbivora_minimap_5.jpg'
     },
@@ -3580,6 +3703,7 @@ header[style*="display:none"] {
       answerLabel: 'Beruang',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah beruang. Aku termasuk hewan omnivora karena dapat memakan berbagai jenis makanan, baik tumbuhan maupun hewan.',
       assetKey: 'beruang',
+      qrImage: 'assets/qr/bear.png',
       slideImage: 'assets/slides/omnivora_1.jpg',
       minimapImage: 'assets/minimaps/omnivora_minimap_1.jpg'
     },
@@ -3601,6 +3725,7 @@ header[style*="display:none"] {
       answerLabel: 'Ayam',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah ayam. Aku termasuk hewan omnivora karena memakan biji-bijian serta hewan kecil seperti cacing dan serangga.',
       assetKey: 'ayam',
+      qrImage: 'assets/qr/chicken.png',
       slideImage: 'assets/slides/omnivora_2.jpg',
       minimapImage: 'assets/minimaps/omnivora_minimap_2.jpg'
     },
@@ -3622,6 +3747,7 @@ header[style*="display:none"] {
       answerLabel: 'Babi',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah babi. Aku termasuk hewan omnivora karena dapat memakan berbagai jenis makanan, seperti tumbuhan dan hewan kecil.',
       assetKey: 'babi',
+      qrImage: 'assets/qr/pigs.png',
       slideImage: 'assets/slides/omnivora_3.jpg',
       minimapImage: 'assets/minimaps/omnivora_minimap_3.jpg'
     },
@@ -3643,6 +3769,7 @@ header[style*="display:none"] {
       answerLabel: 'Monyet',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah monyet. Aku termasuk hewan omnivora karena dapat memakan buah, biji-bijian, dan beberapa jenis hewan kecil.',
       assetKey: 'monyet',
+      qrImage: 'assets/qr/monkey.png',
       slideImage: 'assets/slides/omnivora_4.jpg',
       minimapImage: 'assets/minimaps/omnivora_minimap_4.jpg'
     },
@@ -3664,6 +3791,7 @@ header[style*="display:none"] {
       answerLabel: 'Gagak',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah gagak. Aku termasuk hewan omnivora karena dapat memakan berbagai jenis makanan, seperti biji-bijian, buah, serangga, dan hewan kecil.',
       assetKey: 'gagak',
+      qrImage: 'assets/qr/crow.png',
       slideImage: 'assets/slides/omnivora_5.jpg',
       minimapImage: 'assets/minimaps/omnivora_minimap_5.jpg'
     }
@@ -4784,6 +4912,30 @@ header[style*="display:none"] {
     return svgAssets[normalizedKey] || fallbackSvg;
   }
 
+  // 15 Animal Assemblr Edu QR Code Assets Mapping
+  const qrAssets = {
+    singa: 'assets/qr/lion.png',
+    harimau: 'assets/qr/tiger.png',
+    buaya: 'assets/qr/croc.png',
+    serigala: 'assets/qr/wolf.png',
+    hiu: 'assets/qr/shark.png',
+    sapi: 'assets/qr/cow.png',
+    kelinci: 'assets/qr/rabbit.png',
+    jerapah: 'assets/qr/giraffe.png',
+    gajah: 'assets/qr/elepanth.png',
+    rusa: 'assets/qr/deer.png',
+    beruang: 'assets/qr/bear.png',
+    ayam: 'assets/qr/chicken.png',
+    babi: 'assets/qr/pigs.png',
+    monyet: 'assets/qr/monkey.png',
+    gagak: 'assets/qr/crow.png'
+  };
+
+  function getAnimalQr(key) {
+    if (!key || typeof key !== 'string') return '';
+    return qrAssets[key.toLowerCase().trim()] || '';
+  }
+
   // ===========================================================================
   // 6. GLOBAL EXPORT OBJECT
   // ===========================================================================
@@ -4793,7 +4945,9 @@ header[style*="display:none"] {
     narratives,
     crystals,
     svgAssets,
-    getAssetSvg
+    qrAssets,
+    getAssetSvg,
+    getAnimalQr
   };
 
   // Browser global
@@ -5030,23 +5184,80 @@ header[style*="display:none"] {
       this.ctx = null;
       this.muted = false;
       this.isInitialized = false;
+      this.bgmAudio = null;
+      this.bgmStarted = false;
+      this.bgmVolume = 0.45;
     }
 
     init() {
-      if (this.isInitialized && this.ctx) return;
+      if (!this.isInitialized || !this.ctx) {
+        try {
+          const AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            this.isInitialized = true;
+          }
+        } catch (e) {
+          console.warn('Web Audio API unavailable:', e);
+        }
+      }
+      this.initBgm();
+    }
+
+    initBgm() {
+      if (typeof Audio === 'undefined') return;
+      if (!this.bgmAudio) {
+        try {
+          this.bgmAudio = new Audio('assets/audio/ingame_bgm.mp3');
+          this.bgmAudio.loop = true;
+          this.bgmAudio.volume = this.bgmVolume;
+          this.bgmAudio.preload = 'auto';
+        } catch (e) {
+          console.warn('BGM Audio init error:', e);
+        }
+      }
+    }
+
+    startBgm() {
+      if (this.muted) return;
+      this.initBgm();
+      if (!this.bgmAudio) return;
+      if (this.bgmStarted && !this.bgmAudio.paused) return;
+
       try {
-        const AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
-        if (AudioCtx) {
-          this.ctx = new AudioCtx();
-          this.isInitialized = true;
+        const p = this.bgmAudio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            this.bgmStarted = true;
+          }).catch(() => {
+            this.bgmStarted = false;
+          });
         }
       } catch (e) {
-        console.warn('Web Audio API unavailable:', e);
+        this.bgmStarted = false;
       }
+    }
+
+    pauseBgm() {
+      if (this.bgmAudio) {
+        try {
+          this.bgmAudio.pause();
+        } catch (e) {}
+      }
+    }
+
+    resumeBgm() {
+      if (this.muted) return;
+      this.startBgm();
     }
 
     toggleMute() {
       this.muted = !this.muted;
+      if (this.muted) {
+        this.pauseBgm();
+      } else {
+        this.resumeBgm();
+      }
       return this.muted;
     }
 
@@ -5439,6 +5650,23 @@ header[style*="display:none"] {
         btnRetry.style.display = isCorrect ? 'none' : 'inline-flex';
       }
 
+      // Assemblr Edu AR 3D QR Code Display
+      const qrContainer = document.getElementById('feedback-qr-container');
+      const qrImage = document.getElementById('feedback-qr-image');
+      if (qrContainer) {
+        if (isCorrect && animal) {
+          const key = (animal.id || animal.assetKey || '').toLowerCase();
+          const qrSrc = animal.qrImage || (typeof GAME_DATA !== 'undefined' && GAME_DATA.getAnimalQr ? GAME_DATA.getAnimalQr(key) : '') || `assets/qr/${key}.png`;
+          if (qrImage && qrSrc) {
+            qrImage.src = qrSrc;
+            qrImage.alt = `Assemblr Edu AR QR Code - ${animal.name || key}`;
+          }
+          qrContainer.style.display = 'flex';
+        } else {
+          qrContainer.style.display = 'none';
+        }
+      }
+
       const modals = [
         document.getElementById('modal-feedback'),
         document.getElementById('feedback-modal')
@@ -5478,6 +5706,11 @@ header[style*="display:none"] {
         if (m.style) m.style.display = 'none';
         if (m.setAttribute) m.setAttribute('aria-hidden', 'true');
       });
+
+      const qrContainer = document.getElementById('feedback-qr-container');
+      if (qrContainer && qrContainer.style) {
+        qrContainer.style.display = 'none';
+      }
     }
 
     handleContinue() {
@@ -5814,31 +6047,32 @@ header[style*="display:none"] {
       const kingdom = this.engine ? this.engine.getCurrentKingdom() : null;
 
       if (backBtn && backBtn.style) {
-        backBtn.style.display = 'inline-flex';
-        const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
         if (this.currentScreen === 'screen-splash') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Keluar dari Aplikasi');
-        } else if (this.currentScreen === 'screen-instructions') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Menu Awal');
-        } else if (this.currentScreen === 'screen-main-map') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Petunjuk Permainan');
-        } else if (this.currentScreen === 'screen-kingdom-gate') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
-        } else if (this.currentScreen === 'screen-challenge') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang Kerajaan');
-        } else if (this.currentScreen === 'screen-kingdom-reward') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
-        } else if (this.currentScreen === 'screen-final-victory') {
-          if (span) span.textContent = 'Kembali';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
-        } else {
           backBtn.style.display = 'none';
+        } else {
+          backBtn.style.display = 'inline-flex';
+          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+          if (this.currentScreen === 'screen-instructions') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Menu Awal');
+          } else if (this.currentScreen === 'screen-main-map') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Petunjuk Permainan');
+          } else if (this.currentScreen === 'screen-kingdom-gate') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+          } else if (this.currentScreen === 'screen-challenge') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang Kerajaan');
+          } else if (this.currentScreen === 'screen-kingdom-reward') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+          } else if (this.currentScreen === 'screen-final-victory') {
+            if (span) span.textContent = 'Kembali';
+            if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+          } else {
+            backBtn.style.display = 'none';
+          }
         }
       }
 
@@ -6181,6 +6415,16 @@ header[style*="display:none"] {
         // Click sound for buttons (except quiz options which have their own sound logic)
         if (target.tagName === 'BUTTON' && !target.classList.contains('btn-quiz-option')) {
           if (this.sfx) this.sfx.play('click');
+        }
+
+        // Start / Unlock in-game BGM on first user interaction
+        if (this.sfx) {
+          if (!this.sfx.isInitialized) {
+            this.sfx.init();
+          }
+          if (!this.sfx.bgmStarted && !this.sfx.isMuted()) {
+            this.sfx.startBgm();
+          }
         }
 
         // Handle Option Select

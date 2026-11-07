@@ -1,8 +1,9 @@
-const CACHE_NAME = 'minizoo-cache-v5';
+const CACHE_NAME = 'minizoo-cache-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './assets/audio/ingame_bgm.mp3',
   './assets/slides/cover.jpg',
   './assets/slides/cover_resume.jpg',
   './assets/slides/pembuka.jpg',
@@ -45,7 +46,22 @@ const ASSETS_TO_CACHE = [
   './assets/animals/rusa.jpg',
   './assets/animals/sapi.jpg',
   './assets/animals/serigala.jpg',
-  './assets/animals/singa.jpg'
+  './assets/animals/singa.jpg',
+  './assets/qr/lion.png',
+  './assets/qr/tiger.png',
+  './assets/qr/croc.png',
+  './assets/qr/wolf.png',
+  './assets/qr/shark.png',
+  './assets/qr/cow.png',
+  './assets/qr/rabbit.png',
+  './assets/qr/giraffe.png',
+  './assets/qr/elepanth.png',
+  './assets/qr/deer.png',
+  './assets/qr/bear.png',
+  './assets/qr/chicken.png',
+  './assets/qr/pigs.png',
+  './assets/qr/monkey.png',
+  './assets/qr/crow.png'
 ];
 
 self.addEventListener('install', (event) => {
