@@ -1553,17 +1553,47 @@ html, body {
 }
 
 .feedback-qr-img-wrap {
-  width: 95px;
-  height: 95px;
-  min-width: 95px;
+  width: clamp(140px, 24vw, 175px);
+  height: clamp(140px, 24vw, 175px);
+  min-width: clamp(140px, 24vw, 175px);
   background: #FFFFFF;
-  border: 2px solid #F59E0B;
-  border-radius: 12px;
-  padding: 4px;
+  border: 2.5px solid #F59E0B;
+  border-radius: 14px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.feedback-qr-img-wrap:hover,
+.feedback-qr-img-wrap:focus-visible {
+  transform: scale(1.03);
+  border-color: #D97706;
+  box-shadow: 0 8px 18px rgba(217, 119, 6, 0.35);
+  outline: none;
+}
+
+.qr-zoom-hint {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.78);
+  color: #FFFFFF;
+  font-family: var(--font-game);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.95;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .feedback-qr-image {
@@ -1578,18 +1608,18 @@ html, body {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  gap: 3px;
+  gap: 5px;
   flex: 1;
 }
 
 .feedback-qr-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 3px 10px;
   background: linear-gradient(180deg, #16A34A 0%, #15803D 100%);
   color: #FFFFFF;
   font-family: var(--font-game);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.5px;
   border-radius: 9999px;
@@ -1598,7 +1628,7 @@ html, body {
 
 .qr-label-title {
   font-family: var(--font-game);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #451A03;
   line-height: 1.25;
@@ -1606,18 +1636,91 @@ html, body {
 
 .qr-label-sub {
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #78350F;
   line-height: 1.35;
+}
+
+.btn-qr-zoom-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
+  border: 2px solid #78350F;
+  border-radius: 9999px;
+  color: #FFFFFF;
+  font-family: var(--font-game);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #451A03, 0 4px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.btn-qr-zoom-action:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-qr-zoom-action:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #451A03;
+}
+
+/* ==========================================================================
+   ASSEMBLR EDU AR QR ZOOM VIEWER MODAL
+   ========================================================================== */
+.qr-zoom-modal-card {
+  background: #FFFDF0;
+  border: 4.5px solid var(--color-wood-medium);
+  border-radius: 24px;
+  width: 92%;
+  max-width: 420px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 3px var(--color-gold);
+  animation: modalPopIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-zoom-modal-body {
+  background: #0F172A;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-zoom-img-container {
+  background: #FFFFFF;
+  padding: 10px;
+  border-radius: 16px;
+  border: 3px solid #F59E0B;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(300px, 75vw);
+  height: min(300px, 75vw);
+}
+
+.qr-zoom-modal-view-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 @media (max-width: 480px) {
   .feedback-qr-card {
     flex-direction: column;
     text-align: center;
-    gap: 8px;
-    padding: 10px;
+    gap: 10px;
+    padding: 12px;
   }
   .feedback-qr-label {
     align-items: center;
@@ -3253,13 +3356,17 @@ header[style*="display:none"] {
           <!-- Assemblr Edu AR 3D QR Code Box -->
           <div id="feedback-qr-container" class="feedback-qr-container" style="display:none;">
             <div class="feedback-qr-card">
-              <div class="feedback-qr-img-wrap">
+              <div class="feedback-qr-img-wrap" id="feedback-qr-img-wrap" role="button" tabindex="0" aria-label="Perbesar QR Code">
                 <img id="feedback-qr-image" class="feedback-qr-image" src="assets/qr/lion.png" alt="Assemblr Edu AR QR Code" />
+                <span class="qr-zoom-hint">Ketuk untuk Memperbesar</span>
               </div>
               <div class="feedback-qr-label">
                 <span class="feedback-qr-badge">Assemblr Edu AR 3D</span>
                 <span class="qr-label-title">Lihat Satwa dalam 3D Nyata!</span>
-                <span class="qr-label-sub">Pindai QR Code ini menggunakan aplikasi Assemblr Edu untuk memunculkan model satwa 3D interaktif.</span>
+                <span class="qr-label-sub">Pindai QR Code ini dengan kamera aplikasi Assemblr Edu untuk memunculkan model satwa 3D interaktif.</span>
+                <button type="button" id="btn-open-qr-zoom" class="btn-qr-zoom-action" aria-label="Perbesar QR Code untuk Scan">
+                  <span>Perbesar QR Code</span>
+                </button>
               </div>
             </div>
           </div>
@@ -3272,6 +3379,29 @@ header[style*="display:none"] {
             </button>
             <button id="btn-feedback-close" class="pro-game-cta-btn btn-3d-wood" type="button" style="display:none;">
               <span>Tutup</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- ASSEMBLR EDU AR QR ZOOM VIEWER MODAL                              -->
+      <!-- ================================================================= -->
+      <div id="modal-qr-viewer" class="game-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Assemblr Edu AR QR Code Besar">
+        <div class="qr-zoom-modal-card">
+          <div class="minimap-modal-header">
+            <h3 id="qr-zoom-modal-title" class="minimap-modal-title">QR Code AR Satwa 3D</h3>
+            <button id="btn-close-qr-zoom" class="btn-modal-close" type="button" aria-label="Tutup Tampilan QR">&times;</button>
+          </div>
+          <div class="qr-zoom-modal-body">
+            <div class="qr-zoom-img-container">
+              <img id="qr-zoom-modal-img" class="qr-zoom-modal-view-img" src="assets/qr/lion.png" alt="Assemblr AR QR Code Besar" />
+            </div>
+          </div>
+          <div class="minimap-modal-footer">
+            <span class="minimap-modal-hint">Arahkan kamera Assemblr Edu langsung ke QR Code ini!</span>
+            <button id="btn-qr-zoom-dismiss" class="pro-game-cta-btn btn-3d-green btn-minimap-dismiss" type="button">
+              <span>Selesai Scan</span>
             </button>
           </div>
         </div>
@@ -5657,12 +5787,16 @@ header[style*="display:none"] {
         if (isCorrect && animal) {
           const key = (animal.id || animal.assetKey || '').toLowerCase();
           const qrSrc = animal.qrImage || (typeof GAME_DATA !== 'undefined' && GAME_DATA.getAnimalQr ? GAME_DATA.getAnimalQr(key) : '') || `assets/qr/${key}.png`;
+          this.currentAnimalQr = qrSrc;
+          this.currentAnimalName = animal.name || key;
           if (qrImage && qrSrc) {
             qrImage.src = qrSrc;
             qrImage.alt = `Assemblr Edu AR QR Code - ${animal.name || key}`;
           }
           qrContainer.style.display = 'flex';
         } else {
+          this.currentAnimalQr = null;
+          this.currentAnimalName = null;
           qrContainer.style.display = 'none';
         }
       }
@@ -5710,6 +5844,35 @@ header[style*="display:none"] {
       const qrContainer = document.getElementById('feedback-qr-container');
       if (qrContainer && qrContainer.style) {
         qrContainer.style.display = 'none';
+      }
+      this.closeQrZoom();
+    }
+
+    openQrZoom() {
+      if (typeof document === 'undefined') return;
+      const zoomModal = document.getElementById('modal-qr-viewer');
+      const zoomImg = document.getElementById('qr-zoom-modal-img');
+      const zoomTitle = document.getElementById('qr-zoom-modal-title');
+      if (zoomImg && this.currentAnimalQr) {
+        zoomImg.src = this.currentAnimalQr;
+      }
+      if (zoomTitle && this.currentAnimalName) {
+        zoomTitle.textContent = `QR Code AR 3D - ${this.currentAnimalName}`;
+      }
+      if (zoomModal) {
+        zoomModal.style.display = 'flex';
+        zoomModal.classList.add('active');
+        zoomModal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    closeQrZoom() {
+      if (typeof document === 'undefined') return;
+      const zoomModal = document.getElementById('modal-qr-viewer');
+      if (zoomModal) {
+        zoomModal.style.display = 'none';
+        zoomModal.classList.remove('active');
+        zoomModal.setAttribute('aria-hidden', 'true');
       }
     }
 
@@ -6405,7 +6568,12 @@ header[style*="display:none"] {
                                 id === 'btn-feedback-retry' ||
                                 id === 'btn-feedback-close' ||
                                 id === 'btn-quiz-continue' ||
-                                (target.closest && target.closest('#feedback-modal, #modal-feedback'));
+                                id === 'btn-open-qr-zoom' ||
+                                id === 'btn-close-qr-zoom' ||
+                                id === 'btn-qr-zoom-dismiss' ||
+                                id === 'feedback-qr-img-wrap' ||
+                                id === 'feedback-qr-image' ||
+                                (target.closest && target.closest('#feedback-modal, #modal-feedback, #modal-qr-viewer'));
           if (!isModalAction) {
             if (e.cancelable && e.preventDefault) e.preventDefault();
             return;
@@ -6522,6 +6690,21 @@ header[style*="display:none"] {
           case 'btn-feedback-close':
             if (this.quizController) {
               this.quizController.closeFeedbackModal();
+            }
+            break;
+
+          case 'btn-open-qr-zoom':
+          case 'feedback-qr-img-wrap':
+          case 'feedback-qr-image':
+            if (this.quizController) {
+              this.quizController.openQrZoom();
+            }
+            break;
+
+          case 'btn-close-qr-zoom':
+          case 'btn-qr-zoom-dismiss':
+            if (this.quizController) {
+              this.quizController.closeQrZoom();
             }
             break;
 

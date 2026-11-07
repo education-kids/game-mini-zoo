@@ -1303,13 +1303,16 @@ describe('Task 5: 16:9 SPA HTML Structure (src/Index.html)', () => {
     assert.ok(html.includes('id="btn-finish-game"'), 'Must define #btn-finish-game');
   });
 
-  it('Feedback modal defines required dialog elements', () => {
+  it('Feedback modal defines required dialog elements and zoom viewer', () => {
     const html = getIndexContent();
     assert.ok(html.includes('id="feedback-modal"'), 'Must define #feedback-modal');
     assert.ok(html.includes('id="feedback-title"'), 'Must define #feedback-title');
     assert.ok(html.includes('id="feedback-text"'), 'Must define #feedback-text');
     assert.ok(html.includes('id="feedback-qr-container"'), 'Must define #feedback-qr-container');
     assert.ok(html.includes('id="feedback-qr-image"'), 'Must define #feedback-qr-image');
+    assert.ok(html.includes('id="btn-open-qr-zoom"'), 'Must define #btn-open-qr-zoom');
+    assert.ok(html.includes('id="modal-qr-viewer"'), 'Must define #modal-qr-viewer');
+    assert.ok(html.includes('id="qr-zoom-modal-img"'), 'Must define #qr-zoom-modal-img');
     assert.ok(html.includes('id="btn-feedback-retry"'), 'Must define #btn-feedback-retry');
     assert.ok(html.includes('id="btn-feedback-continue"'), 'Must define #btn-feedback-continue');
   });
