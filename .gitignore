@@ -2,11 +2,28 @@
 node_modules/
 
 # Android & Gradle Build Artifacts
-android/.gradle/
-android/app/build/
-android/build/
+android/
+www/
 *.apk
 *.aab
+
+# Duplicate raw media and extraction folders
+assets/docx_media/
+assets/raw/
+assets/minimaps_raw/
+assets/slides_raw/
+assets/slides/*.png
+assets/minimaps/*.png
+assets/animals/*.png
+
+# Non-web documentation and large source archives
+User Guideline/
+User Guideline.zip
+Karakter Hewan/
+gdrive_samples/
+aset game/
+*.docx
+*.zip
 
 # Local OS & Editor files
 .DS_Store
@@ -21,8 +38,6 @@ test_*.jpg
 test_*.png
 gdrive_raw.html
 gdrive_*.json
-*.docx
-*.zip
 
 # Superpowers agent metadata
 .superpowers/
