@@ -1,0 +1,18 @@
+{
+  "name": "Petualangan Mini Zoo",
+  "short_name": "Mini Zoo",
+  "description": "Game Edukasi Pengelompokan Hewan Berdasarkan Jenis Makanan untuk Anak",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0284C7",
+  "theme_color": "#3BBC37",
+  "icons": [
+    {
+      "src": "assets/animals/singa.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

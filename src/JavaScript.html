@@ -9,6 +9,14 @@
 (function (global) {
   'use strict';
 
+  function setSafeBackgroundImage(el, url) {
+    if (!el || !el.style) return;
+    if (typeof el.style.setProperty === 'function') {
+      el.style.setProperty('background-image', url, 'important');
+    }
+    el.style.backgroundImage = url;
+  }
+
   // ===========================================================================
   // 1. GAME ENGINE & STATE MACHINE (Table J2 & Option A Session Management)
   // ===========================================================================
@@ -444,6 +452,8 @@
       this.sfx = sfx;
       this.router = router;
       this.isModalOpen = false;
+      this.isProcessingAnswer = false;
+      this.lastModalDismissTime = 0;
     }
 
     loadCurrentChallenge() {
@@ -453,10 +463,31 @@
 
       if (typeof document === 'undefined') return;
 
-      // Animal SVG Visual
+      // Set background image to level's authentic slide
+      const challengeScreen = document.getElementById('screen-challenge');
+      if (challengeScreen && level) {
+        if (level.slideImage) {
+          setSafeBackgroundImage(challengeScreen, `url('${level.slideImage}')`);
+        }
+        challengeScreen.setAttribute('data-level-id', (level.id || '').toLowerCase());
+        challengeScreen.setAttribute('data-animal', (level.assetKey || level.id || '').toLowerCase());
+        challengeScreen.setAttribute('data-kingdom-id', (level.kingdomId || '').toLowerCase());
+      }
+
+      // Animal Visual with Transparent Cutout Character Art and SVG Fallback
       const visualEl = document.getElementById('quiz-animal-visual');
       if (visualEl && this.engine.gameData && this.engine.gameData.getAssetSvg) {
-        visualEl.innerHTML = this.engine.gameData.getAssetSvg(level.assetKey || level.id);
+        const animalKey = (level.assetKey || level.id).toLowerCase();
+        const fallbackSvg = this.engine.gameData.getAssetSvg(animalKey);
+        visualEl.innerHTML = `
+          <div class="animal-stage-frame">
+            <img class="animal-photo-img animal-transparent-cutout" src="assets/animals/${animalKey}.png" alt="${level.name}"
+                 onerror="if(!this.src.endsWith('.jpg')){this.src='assets/animals/${animalKey}.jpg';}else{this.style.display='none'; var f=this.parentElement.querySelector('.animal-fallback-svg'); if(f) f.style.display='block';}" />
+            <div class="animal-fallback-svg" style="display:none; width:100%; height:100%;">
+              ${fallbackSvg}
+            </div>
+          </div>
+        `;
       }
 
       // Question text
@@ -514,14 +545,31 @@
 
     handleOptionSelect(optionKey) {
       if (this.isModalOpen || !this.engine) return;
+      this.selectedOptionKey = optionKey;
+
       const validation = this.engine.validateAnswer(optionKey);
+
+      if (typeof document !== 'undefined') {
+        const container = document.getElementById('quiz-options-container');
+        if (container) {
+          const btns = container.querySelectorAll('.btn-quiz-option');
+          btns.forEach(b => {
+            const isMatch = b.getAttribute('data-option-key') === optionKey;
+            b.classList.toggle('selected', isMatch);
+            b.classList.toggle('active', isMatch);
+            b.classList.toggle('correct', isMatch && validation.isCorrect);
+            b.classList.toggle('wrong', isMatch && !validation.isCorrect);
+          });
+        }
+      }
 
       if (validation.isCorrect) {
         if (this.sfx) this.sfx.play('correct');
         this.showFeedbackModal({
           isCorrect: true,
           title: 'Hebat! Jawabanmu Benar!',
-          text: validation.feedback
+          text: validation.feedback,
+          animal: validation.animal
         });
       } else {
         if (this.sfx) this.sfx.play('wrong');
@@ -533,17 +581,40 @@
       }
     }
 
-    showFeedbackModal({ isCorrect, title, text }) {
+    submitAnswer() {
+      if (this.isModalOpen || !this.engine) return;
+      const key = this.selectedOptionKey || 'B';
+      this.handleOptionSelect(key);
+    }
+
+    showFeedbackModal({ isCorrect, title, text, animal }) {
       if (typeof document === 'undefined') return;
       this.isModalOpen = true;
+      this.isProcessingAnswer = false;
 
       const titleEl = document.getElementById('feedback-title');
       const textEl = document.getElementById('feedback-text');
+      const animalInfoEl = document.getElementById('feedback-animal-info');
       const btnContinue = document.getElementById('btn-feedback-continue');
       const btnRetry = document.getElementById('btn-feedback-retry');
 
       if (titleEl) titleEl.textContent = title;
       if (textEl) textEl.textContent = text;
+
+      if (animalInfoEl) {
+        if (isCorrect && animal) {
+          const animalKey = (animal.assetKey || animal.id || '').toLowerCase();
+          animalInfoEl.innerHTML = `
+            <div style="margin: 10px auto; text-align: center; max-height: 120px; display: flex; justify-content: center; align-items: center;">
+              <img src="assets/animals/${animalKey}.png" alt="${animal.name || 'Satwa'}" style="max-height: 110px; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.3));" onerror="this.style.display='none';" />
+            </div>
+          `;
+          animalInfoEl.style.display = 'block';
+        } else {
+          animalInfoEl.innerHTML = '';
+          animalInfoEl.style.display = 'none';
+        }
+      }
 
       if (btnContinue && btnContinue.style) {
         btnContinue.style.display = isCorrect ? 'inline-flex' : 'none';
@@ -566,7 +637,21 @@
 
     closeFeedbackModal() {
       this.isModalOpen = false;
+      this.isProcessingAnswer = false;
+      this.lastModalDismissTime = Date.now();
+      if (this.router) this.router.lastModalDismissTime = Date.now();
       if (typeof document === 'undefined') return;
+
+      // Clean up all option highlights on modal dismissal
+      this.selectedOptionKey = null;
+      const container = document.getElementById('quiz-options-container');
+      if (container) {
+        const btns = container.querySelectorAll('.btn-quiz-option');
+        btns.forEach(b => {
+          b.classList.remove('selected', 'active', 'correct', 'wrong');
+        });
+      }
+
       const modals = [
         document.getElementById('modal-feedback'),
         document.getElementById('feedback-modal')
@@ -635,6 +720,11 @@
         crystalVisualEl.innerHTML = this.engine.gameData.getAssetSvg(kingdom.crystalId);
       }
 
+      const rewardScreen = document.getElementById('screen-kingdom-reward');
+      if (rewardScreen && kingdom && kingdom.endingSlide) {
+        setSafeBackgroundImage(rewardScreen, `url('${kingdom.endingSlide}')`);
+      }
+
       const crystalNameEl = document.getElementById('reward-crystal-name');
       if (crystalNameEl) crystalNameEl.textContent = kingdom.completion.reward;
 
@@ -643,9 +733,9 @@
         if (idx < 2) {
           const nextKingdom = this.engine.gameData.kingdoms[idx + 1];
           const nextName = nextKingdom ? nextKingdom.name.toUpperCase() : 'BERIKUTNYA';
-          btnContinue.textContent = `LANJUT KE ${nextName}`;
+          btnContinue.innerHTML = `<span class="visually-hidden">LANJUT KE ${nextName}</span>`;
         } else {
-          btnContinue.textContent = 'SELESAIKAN PETUALANGAN';
+          btnContinue.innerHTML = `<span class="visually-hidden">SELESAIKAN PETUALANGAN</span>`;
         }
       }
     }
@@ -665,6 +755,21 @@
       if (this.sfx) this.sfx.play('fanfare');
 
       if (typeof document === 'undefined' || !this.engine) return;
+
+      const victoryScreen = document.getElementById('screen-final-victory');
+      const btnVictoryContinue = document.getElementById('btn-victory-continue');
+      const btnPlayAgain = document.getElementById('btn-play-again');
+      const btnFinishGame = document.getElementById('btn-finish-game');
+
+      // Stage 1: Pre-ending authentic narrative slide
+      if (victoryScreen) {
+        setSafeBackgroundImage(victoryScreen, "url('assets/slides/pre_ending.jpg')");
+      }
+      if (btnVictoryContinue) {
+        btnVictoryContinue.style.display = 'inline-block';
+      }
+      if (btnPlayAgain) btnPlayAgain.style.display = 'none';
+      if (btnFinishGame) btnFinishGame.style.display = 'none';
 
       const titleEl = document.getElementById('victory-title');
       if (titleEl) {
@@ -702,6 +807,26 @@
       this._spawnConfetti();
     }
 
+    handleVictoryContinue() {
+      if (this.sfx) this.sfx.play('fanfare');
+      if (typeof document === 'undefined') return;
+
+      const victoryScreen = document.getElementById('screen-final-victory');
+      const btnVictoryContinue = document.getElementById('btn-victory-continue');
+      const btnPlayAgain = document.getElementById('btn-play-again');
+      const btnFinishGame = document.getElementById('btn-finish-game');
+
+      // Stage 2: Tamat authentic celebration slide
+      if (victoryScreen) {
+        setSafeBackgroundImage(victoryScreen, "url('assets/slides/tamat.jpg')");
+      }
+      if (btnVictoryContinue) btnVictoryContinue.style.display = 'none';
+      if (btnPlayAgain) btnPlayAgain.style.display = 'inline-block';
+      if (btnFinishGame) btnFinishGame.style.display = 'inline-block';
+
+      this._spawnConfetti();
+    }
+
     handlePlayAgain() {
       if (this.sfx) this.sfx.play('click');
       if (this.engine) this.engine.resetProgress();
@@ -711,9 +836,10 @@
     }
 
     handleFinish() {
-      if (this.sfx) this.sfx.play('click');
-      if (typeof window !== 'undefined' && window.alert) {
-        window.alert('Terima kasih telah menjelajahi Mini Zoo! Sampai jumpa lagi, Penjaga Satwa!');
+      if (this.sfx) this.sfx.play('fanfare');
+      if (this.engine) this.engine.resetProgress();
+      if (this.router) {
+        this.router.navigateTo('screen-splash');
       }
     }
 
@@ -872,16 +998,29 @@
       const kingdom = this.engine ? this.engine.getCurrentKingdom() : null;
 
       if (backBtn && backBtn.style) {
-        if (this.currentScreen === 'screen-challenge') {
-          backBtn.style.display = 'inline-flex';
-          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
-          if (span) span.textContent = 'Gerbang';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang');
+        backBtn.style.display = 'inline-flex';
+        const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
+        if (this.currentScreen === 'screen-splash') {
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Keluar dari Aplikasi');
+        } else if (this.currentScreen === 'screen-instructions') {
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Menu Awal');
+        } else if (this.currentScreen === 'screen-main-map') {
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Petunjuk Permainan');
         } else if (this.currentScreen === 'screen-kingdom-gate') {
-          backBtn.style.display = 'inline-flex';
-          const span = backBtn.querySelector ? backBtn.querySelector('span') : null;
-          if (span) span.textContent = 'Peta';
-          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta');
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+        } else if (this.currentScreen === 'screen-challenge') {
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Gerbang Kerajaan');
+        } else if (this.currentScreen === 'screen-kingdom-reward') {
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
+        } else if (this.currentScreen === 'screen-final-victory') {
+          if (span) span.textContent = 'Kembali';
+          if (backBtn.setAttribute) backBtn.setAttribute('aria-label', 'Kembali ke Peta Dunia');
         } else {
           backBtn.style.display = 'none';
         }
@@ -921,10 +1060,20 @@
       const savedInfo = document.getElementById ? document.getElementById('splash-saved-info') : null;
       const resumeBox = document.getElementById ? document.getElementById('session-resume-box') : null;
 
+      const splashScreen = document.getElementById ? document.getElementById('screen-splash') : null;
+
       if (btnStart && btnStart.style) btnStart.style.display = hasProgress ? 'none' : 'inline-flex';
       if (resumeBox && resumeBox.style) resumeBox.style.display = hasProgress ? 'flex' : 'none';
       if (btnResume && btnResume.style) btnResume.style.display = hasProgress ? 'inline-flex' : 'none';
       if (btnNew && btnNew.style) btnNew.style.display = hasProgress ? 'inline-flex' : 'none';
+
+      if (splashScreen && splashScreen.classList) {
+        if (hasProgress) {
+          splashScreen.classList.add('has-saved-session');
+        } else {
+          splashScreen.classList.remove('has-saved-session');
+        }
+      }
 
       if (savedInfo) {
         if (hasProgress) {
@@ -986,6 +1135,11 @@
       if (gateCastleVisual && this.engine.gameData && this.engine.gameData.getAssetSvg) {
         gateCastleVisual.innerHTML = this.engine.gameData.getAssetSvg(kingdom.castleKey);
       }
+
+      const gateScreen = document.getElementById ? document.getElementById('screen-kingdom-gate') : null;
+      if (gateScreen && kingdom && kingdom.gateSlide) {
+        setSafeBackgroundImage(gateScreen, `url('${kingdom.gateSlide}')`);
+      }
     }
 
     openKingdomGate(kingdomIdx) {
@@ -998,30 +1152,194 @@
         if (this.sfx) this.sfx.play('wrong');
         const prevKingdom = this.engine.gameData && this.engine.gameData.kingdoms ? this.engine.gameData.kingdoms[kingdomIdx - 1] : null;
         const prevName = prevKingdom ? prevKingdom.name : 'sebelumnya';
-        if (typeof window !== 'undefined' && window.alert) {
-          window.alert(`Kerajaan ini masih terkunci! Selesaikan semua tantangan di ${prevName} terlebih dahulu.`);
-        }
+        this.showLockedKingdomModal(prevName);
+        this.showToast(`Kerajaan masih terkunci! Selesaikan tantangan di ${prevName} terlebih dahulu.`);
       }
     }
 
+    showLockedKingdomModal(prevKingdomName) {
+      if (typeof document === 'undefined') return;
+      const modal = document.getElementById('modal-kingdom-locked');
+      const msgEl = document.getElementById('kingdom-locked-message');
+      if (msgEl) {
+        msgEl.textContent = `Gerbang kerajaan ini masih tersegel! Selesaikan seluruh 5 pos tantangan di ${prevKingdomName} terlebih dahulu untuk memperoleh kristal pembuka.`;
+      }
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    closeLockedKingdomModal() {
+      if (typeof document === 'undefined') return;
+      this.lastModalDismissTime = Date.now();
+      const modal = document.getElementById('modal-kingdom-locked');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+
+    showExitModal() {
+      if (typeof document === 'undefined') return;
+      const modal = document.getElementById('modal-app-exit');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    closeExitModal() {
+      if (typeof document === 'undefined') return;
+      this.lastModalDismissTime = Date.now();
+      const modal = document.getElementById('modal-app-exit');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+
+    confirmExit() {
+      if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App && window.Capacitor.Plugins.App.exitApp) {
+        window.Capacitor.Plugins.App.exitApp();
+      } else {
+        this.closeExitModal();
+        this.navigateTo('screen-splash');
+      }
+    }
+
+    openMinimapModal(mapSrc, title) {
+      if (typeof document === 'undefined') return;
+      const modal = document.getElementById('modal-minimap-viewer');
+      const img = document.getElementById('minimap-modal-img');
+      const titleEl = document.getElementById('minimap-modal-title');
+      if (img && mapSrc) img.src = mapSrc;
+      if (titleEl && title) titleEl.textContent = title;
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    closeMinimapModal() {
+      if (typeof document === 'undefined') return;
+      this.lastModalDismissTime = Date.now();
+      const modal = document.getElementById('modal-minimap-viewer');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+
+    openFlowchartModal() {
+      if (typeof document === 'undefined') return;
+      const modal = document.getElementById('modal-flowchart-viewer');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    closeFlowchartModal() {
+      if (typeof document === 'undefined') return;
+      this.lastModalDismissTime = Date.now();
+      const modal = document.getElementById('modal-flowchart-viewer');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+
+    handleAndroidBackButton() {
+      if (this.quizController && this.quizController.isModalOpen) {
+        this.quizController.closeFeedbackModal();
+        return;
+      }
+      const minimap = document.getElementById ? document.getElementById('modal-minimap-viewer') : null;
+      if (minimap && minimap.style && minimap.style.display !== 'none') {
+        this.closeMinimapModal();
+        return;
+      }
+      const flowchart = document.getElementById ? document.getElementById('modal-flowchart-viewer') : null;
+      if (flowchart && flowchart.style && flowchart.style.display !== 'none') {
+        this.closeFlowchartModal();
+        return;
+      }
+      const lockedModal = document.getElementById ? document.getElementById('modal-kingdom-locked') : null;
+      if (lockedModal && lockedModal.style && lockedModal.style.display !== 'none') {
+        this.closeLockedKingdomModal();
+        return;
+      }
+      const exitModal = document.getElementById ? document.getElementById('modal-app-exit') : null;
+      if (exitModal && exitModal.style && exitModal.style.display !== 'none') {
+        this.closeExitModal();
+        return;
+      }
+
+      if (this.currentScreen === 'screen-splash') {
+        this.showExitModal();
+        return;
+      }
+
+      this.handleBackNav();
+    }
+
+    showToast(message, duration = 3000) {
+      if (typeof document === 'undefined') return;
+      let toast = document.getElementById('game-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'game-toast';
+        toast.className = 'game-toast';
+        const viewport = document.querySelector('.game-canvas-container') || document.body;
+        viewport.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.classList.add('show');
+      if (this._toastTimer) clearTimeout(this._toastTimer);
+      this._toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
     handleBackNav() {
-      if (this.currentScreen === 'screen-kingdom-gate') {
-        this.navigateTo('screen-main-map');
+      if (this.sfx) this.sfx.play('click');
+      if (this.currentScreen === 'screen-splash') {
+        this.showExitModal();
+        return;
       } else if (this.currentScreen === 'screen-challenge') {
         this.navigateTo('screen-kingdom-gate');
+      } else if (this.currentScreen === 'screen-kingdom-gate') {
+        this.navigateTo('screen-main-map');
+      } else if (this.currentScreen === 'screen-kingdom-reward') {
+        this.navigateTo('screen-main-map');
+      } else if (this.currentScreen === 'screen-main-map') {
+        this.navigateTo('screen-instructions');
       } else if (this.currentScreen === 'screen-instructions') {
         this.navigateTo('screen-splash');
-      } else if (this.currentScreen === 'screen-main-map') {
-        this.navigateTo('screen-splash');
-      } else {
+      } else if (this.currentScreen === 'screen-final-victory') {
         this.navigateTo('screen-main-map');
+      } else {
+        this.navigateTo('screen-splash');
       }
     }
 
     setupEventListeners() {
       if (typeof document === 'undefined' || !document.addEventListener) return;
 
+      let lastTouchTime = 0;
       const handleGlobalInteraction = (e) => {
+        if (e.type === 'click' && lastTouchTime > 0 && Date.now() - lastTouchTime < 450) {
+          if (e.cancelable && e.preventDefault) e.preventDefault();
+          return;
+        }
+        if (e.type === 'touchend') {
+          lastTouchTime = Date.now();
+          if (e.cancelable && e.preventDefault) {
+            e.preventDefault();
+          }
+        }
+
         const target = e.target && e.target.closest ? e.target.closest('[id], button, a, [data-action], [data-kingdom-index], [data-option-key]') : null;
         if (!target) return;
 
@@ -1029,6 +1347,19 @@
         const action = target.getAttribute ? (target.getAttribute('data-action') || '') : '';
         const kingdomIndexAttr = target.getAttribute ? target.getAttribute('data-kingdom-index') : null;
         const optionKeyAttr = target.getAttribute ? target.getAttribute('data-option-key') : null;
+
+        // If feedback modal is open, only allow modal action buttons
+        if (this.quizController && this.quizController.isModalOpen) {
+          const isModalAction = id === 'btn-feedback-continue' ||
+                                id === 'btn-feedback-retry' ||
+                                id === 'btn-feedback-close' ||
+                                id === 'btn-quiz-continue' ||
+                                (target.closest && target.closest('#feedback-modal, #modal-feedback'));
+          if (!isModalAction) {
+            if (e.cancelable && e.preventDefault) e.preventDefault();
+            return;
+          }
+        }
 
         // Click sound for buttons (except quiz options which have their own sound logic)
         if (target.tagName === 'BUTTON' && !target.classList.contains('btn-quiz-option')) {
@@ -1112,6 +1443,17 @@
             this.navigateTo('screen-challenge');
             break;
 
+          case 'btn-quiz-submit':
+          case 'quiz-submit-hotspot':
+            if (this.quizController) {
+              if (this.quizController.submitAnswer) {
+                this.quizController.submitAnswer();
+              } else {
+                this.quizController.handleOptionSelect('B');
+              }
+            }
+            break;
+
           case 'btn-feedback-continue':
           case 'btn-quiz-continue':
             if (this.quizController) {
@@ -1134,6 +1476,63 @@
               } else {
                 this.navigateTo('screen-final-victory');
               }
+            }
+            break;
+
+          case 'quiz-minimap-hotspot':
+            if (this.engine) {
+              const lvl = this.engine.getCurrentLevelData();
+              const mapSrc = (lvl && lvl.minimapImage) ? lvl.minimapImage : 'assets/minimaps/karnivora_minimap_1.jpg';
+              this.openMinimapModal(mapSrc, `Peta Jalur: ${lvl ? lvl.name : ''}`);
+            }
+            break;
+
+          case 'btn-gate-minimap':
+            if (this.engine) {
+              const k = this.engine.getCurrentKingdom();
+              const mapSrc = (k && k.minimapGate) ? k.minimapGate : 'assets/minimaps/karnivora_minimap_1.jpg';
+              this.openMinimapModal(mapSrc, `Peta Jalur Kerajaan: ${k ? k.name : ''}`);
+            }
+            break;
+
+          case 'btn-reward-minimap':
+            if (this.engine) {
+              const k = this.engine.getCurrentKingdom();
+              const mapSrc = (k && k.minimapEnd) ? k.minimapEnd : 'assets/minimaps/karnivora_minimap_end.jpg';
+              this.openMinimapModal(mapSrc, `Peta Jalur Tuntas: ${k ? k.name : ''}`);
+            }
+            break;
+
+          case 'btn-close-minimap':
+          case 'btn-minimap-dismiss':
+            this.closeMinimapModal();
+            break;
+
+          case 'btn-view-flowchart':
+            this.openFlowchartModal();
+            break;
+
+          case 'btn-close-flowchart':
+          case 'btn-flowchart-dismiss':
+            this.closeFlowchartModal();
+            break;
+
+          case 'btn-close-locked-dialog':
+          case 'btn-dismiss-locked-dialog':
+            this.closeLockedKingdomModal();
+            break;
+
+          case 'btn-cancel-exit':
+            this.closeExitModal();
+            break;
+
+          case 'btn-confirm-exit':
+            this.confirmExit();
+            break;
+
+          case 'btn-victory-continue':
+            if (this.victoryController && this.victoryController.handleVictoryContinue) {
+              this.victoryController.handleVictoryContinue();
             }
             break;
 
@@ -1187,7 +1586,25 @@
       // BULLETPROOF EVENT CAPTURE DELEGATION:
       // Captures click and touchend at top document level with capture=true
       document.addEventListener('click', handleGlobalInteraction, true);
-      document.addEventListener('touchend', handleGlobalInteraction, { capture: true, passive: true });
+      document.addEventListener('touchend', handleGlobalInteraction, { capture: true, passive: false });
+
+      // Enterprise Android Hardware Back Button & Gesture Navigation
+      if (typeof window !== 'undefined') {
+        if (typeof document !== 'undefined' && document.addEventListener) {
+          document.addEventListener('backbutton', (e) => {
+            if (e && e.preventDefault) e.preventDefault();
+            this.handleAndroidBackButton();
+          }, false);
+        }
+
+        try {
+          if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+            window.Capacitor.Plugins.App.addListener('backButton', () => {
+              this.handleAndroidBackButton();
+            });
+          }
+        } catch (err) {}
+      }
     }
   }
 

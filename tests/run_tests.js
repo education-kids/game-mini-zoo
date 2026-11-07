@@ -232,9 +232,9 @@ describe('GameData: schema and 15 level definitions verified', () => {
       },
       {
         id: 'harimau',
-        answer: 'A',
-        clue: 'Aku pemakan daging. Tubuhku memiliki belang hitam dan oranye.',
-        options: ['A. Harimau', 'B. Kelinci', 'C. Kambing']
+        answer: 'B',
+        clue: 'Aku predator yang lincah, memiliki belang hitam di tubuhku.',
+        options: ['A. Singa', 'B. Harimau', 'C. Serigala']
       },
       {
         id: 'buaya',
@@ -244,9 +244,9 @@ describe('GameData: schema and 15 level definitions verified', () => {
       },
       {
         id: 'serigala',
-        answer: 'C',
-        clue: 'Aku pemakan daging. Aku sering hidup berkelompok dan berkomunikasi dengan lolongan.',
-        options: ['A. Rubah', 'B. Anjing', 'C. Serigala']
+        answer: 'B',
+        clue: 'Aku pemakan daging. Aku hidup di hutan dan memiliki indra penglihatan yang sangat tajam.',
+        options: ['A. Rubah', 'B. Serigala', 'C. Anjing']
       },
       {
         id: 'hiu',
@@ -292,21 +292,21 @@ describe('GameData: schema and 15 level definitions verified', () => {
       },
       {
         id: 'ayam',
-        answer: 'B',
-        clue: 'Aku pemakan segalanya. Aku memakan biji-bijian dan juga cacing tanah.',
-        options: ['A. Bebek', 'B. Ayam', 'C. Angsa']
+        answer: 'A',
+        clue: 'Aku ayam yang ceria. Aku suka berkokok di pagi hari dan mencari biji-bijian.',
+        options: ['A. Ayam', 'B. Kelinci', 'C. Bebek']
       },
       {
         id: 'babi',
-        answer: 'C',
-        clue: 'Aku pemakan segalanya. Hidungku bulat dan aku memakan umbi serta sisa makanan.',
-        options: ['A. Kuda', 'B. Kambing', 'C. Babi']
+        answer: 'B',
+        clue: 'Aku adalah hewan omnivora. Aku bisa makan tumbuhan, buah, akar, dan hewan kecil. Hidungku berbentuk moncong dan tubuhku cukup gemuk.',
+        options: ['A. Beruang', 'B. Babi', 'C. Monyet']
       },
       {
         id: 'monyet',
         answer: 'A',
-        clue: 'Aku pemakan segalanya. Aku suka buah, biji, dan serangga kecil di pohon.',
-        options: ['A. Monyet', 'B. Kelinci', 'C. Rusa']
+        clue: 'Aku suka memanjat pohon. Aku suka buah-buahan dan sangat lincah.',
+        options: ['A. Monyet', 'B. Ayam', 'C. Babi']
       },
       {
         id: 'gagak',
@@ -429,7 +429,11 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
         parentElement: null,
         innerHTML: '',
         textContent: '',
-        style: {},
+        style: {
+          setProperty(prop, val) {
+            this[prop] = val;
+          }
+        },
         classList: {
           add: (...classes) => classes.forEach(c => classListSet.add(c)),
           remove: (...classes) => classes.forEach(c => classListSet.delete(c)),
@@ -756,7 +760,7 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
     assert.strictEqual(engine.isKingdomUnlocked(1), false);
     assert.strictEqual(engine.isKingdomUnlocked(2), false);
 
-    const k1Answers = ['B', 'A', 'B', 'C', 'B'];
+    const k1Answers = ['B', 'B', 'B', 'B', 'B'];
     for (let i = 0; i < 5; i++) {
       assert.strictEqual(engine.currentLevelIndex, i);
       const val = engine.validateAnswer(k1Answers[i]);
@@ -791,7 +795,7 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
     assert.strictEqual(engine.currentKingdomIndex, 2);
     assert.strictEqual(engine.currentLevelIndex, 0);
 
-    const k3Answers = ['A', 'B', 'C', 'A', 'B'];
+    const k3Answers = ['A', 'A', 'B', 'A', 'B'];
     for (let i = 0; i < 4; i++) {
       const val = engine.validateAnswer(k3Answers[i]);
       assert.strictEqual(val.isCorrect, true);
@@ -851,7 +855,7 @@ describe('Task 3: JavaScript Modules (GameEngine, SoundEffects, MiniMap, Quiz, N
     quiz.handleContinue();
     assert.strictEqual(quiz.isModalOpen, false);
     assert.strictEqual(engine.currentLevelIndex, 1, 'Level must now be 1 (Harimau)');
-    assert.ok(document.getElementById('quiz-clue').textContent.includes('belang hitam dan oranye'), 'Clue must now be Harimau');
+    assert.ok(document.getElementById('quiz-clue').textContent.includes('belang hitam'), 'Clue must now be Harimau');
     assert.ok(document.getElementById('quiz-level-indicator').textContent.includes('2 dari 5'));
   });
 

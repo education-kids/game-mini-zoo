@@ -24,6 +24,10 @@
       emblem: 'Emblem telapak kaki',
       emblemKey: 'emblem_karnivora',
       castleKey: 'karnivora_castle',
+      minimapGate: 'assets/minimaps/karnivora_minimap_1.jpg',
+      minimapEnd: 'assets/minimaps/karnivora_minimap_end.jpg',
+      gateSlide: 'assets/slides/karnivora_gate.jpg',
+      endingSlide: 'assets/slides/karnivora_ending.jpg',
       intro: {
         title: 'Selamat datang di Kerajaan Karnivora!',
         desc: 'Di sini, kamu akan bertemu hewan-hewan pemakan daging yang tangguh. Amati petunjuknya, kenali setiap hewan, dan buktikan keberanianmu!\nTemukan kelima hewan dan selesaikan semua tantangannya!'
@@ -45,6 +49,10 @@
       emblem: 'Emblem daun',
       emblemKey: 'emblem_herbivora',
       castleKey: 'herbivora_castle',
+      minimapGate: 'assets/minimaps/herbivora_minimap_1.jpg',
+      minimapEnd: 'assets/minimaps/herbivora_minimap_end.jpg',
+      gateSlide: 'assets/slides/herbivora_gate.jpg',
+      endingSlide: 'assets/slides/herbivora_ending.jpg',
       intro: {
         title: 'Selamat datang di Kerajaan Herbivora!',
         desc: 'Di sini, kamu akan bertemu hewan-hewan pemakan tumbuhan yang ramah. Amati kehidupan mereka, dan jelajahi keindahan kerajaan ini!\nTemukan kelima hewan dan selesaikan semua tantangannya!'
@@ -66,6 +74,10 @@
       emblem: 'Emblem daun dan daging',
       emblemKey: 'emblem_omnivora',
       castleKey: 'omnivora_castle',
+      minimapGate: 'assets/minimaps/omnivora_minimap_1.jpg',
+      minimapEnd: 'assets/minimaps/omnivora_minimap_ending.jpg',
+      gateSlide: 'assets/slides/omnivora_gate.jpg',
+      endingSlide: 'assets/slides/omnivora_ending.jpg',
       intro: {
         title: 'Selamat datang di Kerajaan Omnivora!',
         desc: 'Di sini, kamu akan bertemu hewan-hewan pemakan segala jenis makanan. Amati keragaman mereka, dan jelajahi kerajaan ini!\nSiapkan dirimu untuk menemukan kelima hewan dan menyelesaikan tantangan terakhir!'
@@ -100,7 +112,9 @@
       answer: 'B',
       answerLabel: 'Singa',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah singa. Aku termasuk hewan karnivora karena memakan daging. Surai lebat di sekitar kepala dan leher merupakan salah satu ciri khas singa jantan.',
-      assetKey: 'singa'
+      assetKey: 'singa',
+      slideImage: 'assets/slides/karnivora_1.jpg',
+      minimapImage: 'assets/minimaps/karnivora_minimap_1.jpg'
     },
     {
       id: 'harimau',
@@ -108,18 +122,20 @@
       kingdomId: 'karnivora',
       kingdomLevel: 2,
       overallLevel: 2,
-      clue: 'Aku pemakan daging. Tubuhku memiliki belang hitam dan oranye.',
+      clue: 'Aku predator yang lincah, memiliki belang hitam di tubuhku.',
       question: 'Siapakah aku?',
-      options: ['A. Harimau', 'B. Kelinci', 'C. Kambing'],
+      options: ['A. Singa', 'B. Harimau', 'C. Serigala'],
       choices: [
-        { key: 'A', text: 'Harimau', label: 'A. Harimau' },
-        { key: 'B', text: 'Kelinci', label: 'B. Kelinci' },
-        { key: 'C', text: 'Kambing', label: 'C. Kambing' }
+        { key: 'A', text: 'Singa', label: 'A. Singa' },
+        { key: 'B', text: 'Harimau', label: 'B. Harimau' },
+        { key: 'C', text: 'Serigala', label: 'C. Serigala' }
       ],
-      answer: 'A',
+      answer: 'B',
       answerLabel: 'Harimau',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah harimau. Aku termasuk hewan karnivora karena memakan daging. Belang pada tubuhku menjadi salah satu ciri khas yang mudah dikenali.',
-      assetKey: 'harimau'
+      assetKey: 'harimau',
+      slideImage: 'assets/slides/karnivora_2.jpg',
+      minimapImage: 'assets/minimaps/karnivora_minimap_2.jpg'
     },
     {
       id: 'buaya',
@@ -138,7 +154,9 @@
       answer: 'B',
       answerLabel: 'Buaya',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah buaya. Aku termasuk hewan karnivora karena memakan hewan lain. Rahangku kuat dan gigi tajam membantuku menangkap mangsa.',
-      assetKey: 'buaya'
+      assetKey: 'buaya',
+      slideImage: 'assets/slides/karnivora_3.jpg',
+      minimapImage: 'assets/minimaps/karnivora_minimap_3.jpg'
     },
     {
       id: 'serigala',
@@ -146,18 +164,20 @@
       kingdomId: 'karnivora',
       kingdomLevel: 4,
       overallLevel: 4,
-      clue: 'Aku pemakan daging. Aku sering hidup berkelompok dan berkomunikasi dengan lolongan.',
+      clue: 'Aku pemakan daging. Aku hidup di hutan dan memiliki indra penglihatan yang sangat tajam.',
       question: 'Siapakah aku?',
-      options: ['A. Rubah', 'B. Anjing', 'C. Serigala'],
+      options: ['A. Rubah', 'B. Serigala', 'C. Anjing'],
       choices: [
         { key: 'A', text: 'Rubah', label: 'A. Rubah' },
-        { key: 'B', text: 'Anjing', label: 'B. Anjing' },
-        { key: 'C', text: 'Serigala', label: 'C. Serigala' }
+        { key: 'B', text: 'Serigala', label: 'B. Serigala' },
+        { key: 'C', text: 'Anjing', label: 'C. Anjing' }
       ],
-      answer: 'C',
+      answer: 'B',
       answerLabel: 'Serigala',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah serigala. Aku termasuk hewan karnivora. Aku sering hidup dalam kelompok dan menggunakan lolongan untuk berkomunikasi.',
-      assetKey: 'serigala'
+      assetKey: 'serigala',
+      slideImage: 'assets/slides/karnivora_4.jpg',
+      minimapImage: 'assets/minimaps/karnivora_minimap_4.jpg'
     },
     {
       id: 'hiu',
@@ -176,7 +196,9 @@
       answer: 'B',
       answerLabel: 'Hiu',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah hiu. Aku termasuk hewan karnivora karena memakan hewan laut lain. Aku bernapas menggunakan insang dan memiliki banyak gigi.',
-      assetKey: 'hiu'
+      assetKey: 'hiu',
+      slideImage: 'assets/slides/karnivora_5.jpg',
+      minimapImage: 'assets/minimaps/karnivora_minimap_5.jpg'
     },
 
     // --- KERAJAAN 2: HERBIVORA ---
@@ -197,7 +219,9 @@
       answer: 'B',
       answerLabel: 'Sapi',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah sapi. Aku termasuk hewan herbivora karena memakan tumbuhan seperti rumput. Susuku juga dapat diolah menjadi berbagai produk makanan.',
-      assetKey: 'sapi'
+      assetKey: 'sapi',
+      slideImage: 'assets/slides/herbivora_1.jpg',
+      minimapImage: 'assets/minimaps/herbivora_minimap_1.jpg'
     },
     {
       id: 'kelinci',
@@ -216,7 +240,9 @@
       answer: 'A',
       answerLabel: 'Kelinci',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah kelinci. Aku termasuk hewan herbivora karena memakan tumbuhan seperti rumput dan berbagai jenis sayuran.',
-      assetKey: 'kelinci'
+      assetKey: 'kelinci',
+      slideImage: 'assets/slides/herbivora_2.jpg',
+      minimapImage: 'assets/minimaps/herbivora_minimap_2.jpg'
     },
     {
       id: 'jerapah',
@@ -235,7 +261,9 @@
       answer: 'B',
       answerLabel: 'Jerapah',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah jerapah. Aku termasuk hewan herbivora karena memakan tumbuhan. Leherku yang panjang membantuku menjangkau daun di pohon yang tinggi.',
-      assetKey: 'jerapah'
+      assetKey: 'jerapah',
+      slideImage: 'assets/slides/herbivora_3.jpg',
+      minimapImage: 'assets/minimaps/herbivora_minimap_3.jpg'
     },
     {
       id: 'gajah',
@@ -254,7 +282,9 @@
       answer: 'B',
       answerLabel: 'Gajah',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah gajah. Aku termasuk hewan herbivora karena memakan tumbuhan. Belalaiku membantuku mengambil makanan dan minum.',
-      assetKey: 'gajah'
+      assetKey: 'gajah',
+      slideImage: 'assets/slides/herbivora_4.jpg',
+      minimapImage: 'assets/minimaps/herbivora_minimap_4.jpg'
     },
     {
       id: 'rusa',
@@ -273,7 +303,9 @@
       answer: 'B',
       answerLabel: 'Rusa',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah rusa. Aku termasuk hewan herbivora karena memakan tumbuhan seperti rumput, daun, dan tunas.',
-      assetKey: 'rusa'
+      assetKey: 'rusa',
+      slideImage: 'assets/slides/herbivora_5.jpg',
+      minimapImage: 'assets/minimaps/herbivora_minimap_5.jpg'
     },
 
     // --- KERAJAAN 3: OMNIVORA ---
@@ -294,7 +326,9 @@
       answer: 'A',
       answerLabel: 'Beruang',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah beruang. Aku termasuk hewan omnivora karena dapat memakan berbagai jenis makanan, baik tumbuhan maupun hewan.',
-      assetKey: 'beruang'
+      assetKey: 'beruang',
+      slideImage: 'assets/slides/omnivora_1.jpg',
+      minimapImage: 'assets/minimaps/omnivora_minimap_1.jpg'
     },
     {
       id: 'ayam',
@@ -302,18 +336,20 @@
       kingdomId: 'omnivora',
       kingdomLevel: 2,
       overallLevel: 12,
-      clue: 'Aku pemakan segalanya. Aku memakan biji-bijian dan juga cacing tanah.',
+      clue: 'Aku ayam yang ceria. Aku suka berkokok di pagi hari dan mencari biji-bijian.',
       question: 'Siapakah aku?',
-      options: ['A. Bebek', 'B. Ayam', 'C. Angsa'],
+      options: ['A. Ayam', 'B. Kelinci', 'C. Bebek'],
       choices: [
-        { key: 'A', text: 'Bebek', label: 'A. Bebek' },
-        { key: 'B', text: 'Ayam', label: 'B. Ayam' },
-        { key: 'C', text: 'Angsa', label: 'C. Angsa' }
+        { key: 'A', text: 'Ayam', label: 'A. Ayam' },
+        { key: 'B', text: 'Kelinci', label: 'B. Kelinci' },
+        { key: 'C', text: 'Bebek', label: 'C. Bebek' }
       ],
-      answer: 'B',
+      answer: 'A',
       answerLabel: 'Ayam',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah ayam. Aku termasuk hewan omnivora karena memakan biji-bijian serta hewan kecil seperti cacing dan serangga.',
-      assetKey: 'ayam'
+      assetKey: 'ayam',
+      slideImage: 'assets/slides/omnivora_2.jpg',
+      minimapImage: 'assets/minimaps/omnivora_minimap_2.jpg'
     },
     {
       id: 'babi',
@@ -321,18 +357,20 @@
       kingdomId: 'omnivora',
       kingdomLevel: 3,
       overallLevel: 13,
-      clue: 'Aku pemakan segalanya. Hidungku bulat dan aku memakan umbi serta sisa makanan.',
+      clue: 'Aku adalah hewan omnivora. Aku bisa makan tumbuhan, buah, akar, dan hewan kecil. Hidungku berbentuk moncong dan tubuhku cukup gemuk.',
       question: 'Siapakah aku?',
-      options: ['A. Kuda', 'B. Kambing', 'C. Babi'],
+      options: ['A. Beruang', 'B. Babi', 'C. Monyet'],
       choices: [
-        { key: 'A', text: 'Kuda', label: 'A. Kuda' },
-        { key: 'B', text: 'Kambing', label: 'B. Kambing' },
-        { key: 'C', text: 'Babi', label: 'C. Babi' }
+        { key: 'A', text: 'Beruang', label: 'A. Beruang' },
+        { key: 'B', text: 'Babi', label: 'B. Babi' },
+        { key: 'C', text: 'Monyet', label: 'C. Monyet' }
       ],
-      answer: 'C',
+      answer: 'B',
       answerLabel: 'Babi',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah babi. Aku termasuk hewan omnivora karena dapat memakan berbagai jenis makanan, seperti tumbuhan dan hewan kecil.',
-      assetKey: 'babi'
+      assetKey: 'babi',
+      slideImage: 'assets/slides/omnivora_3.jpg',
+      minimapImage: 'assets/minimaps/omnivora_minimap_3.jpg'
     },
     {
       id: 'monyet',
@@ -340,18 +378,20 @@
       kingdomId: 'omnivora',
       kingdomLevel: 4,
       overallLevel: 14,
-      clue: 'Aku pemakan segalanya. Aku suka buah, biji, dan serangga kecil di pohon.',
+      clue: 'Aku suka memanjat pohon. Aku suka buah-buahan dan sangat lincah.',
       question: 'Siapakah aku?',
-      options: ['A. Monyet', 'B. Kelinci', 'C. Rusa'],
+      options: ['A. Monyet', 'B. Ayam', 'C. Babi'],
       choices: [
         { key: 'A', text: 'Monyet', label: 'A. Monyet' },
-        { key: 'B', text: 'Kelinci', label: 'B. Kelinci' },
-        { key: 'C', text: 'Rusa', label: 'C. Rusa' }
+        { key: 'B', text: 'Ayam', label: 'B. Ayam' },
+        { key: 'C', text: 'Babi', label: 'C. Babi' }
       ],
       answer: 'A',
       answerLabel: 'Monyet',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah monyet. Aku termasuk hewan omnivora karena dapat memakan buah, biji-bijian, dan beberapa jenis hewan kecil.',
-      assetKey: 'monyet'
+      assetKey: 'monyet',
+      slideImage: 'assets/slides/omnivora_4.jpg',
+      minimapImage: 'assets/minimaps/omnivora_minimap_4.jpg'
     },
     {
       id: 'gagak',
@@ -370,7 +410,9 @@
       answer: 'B',
       answerLabel: 'Gagak',
       feedback: 'Hebat! Kamu berhasil mengenaliku!\nAku adalah gagak. Aku termasuk hewan omnivora karena dapat memakan berbagai jenis makanan, seperti biji-bijian, buah, serangga, dan hewan kecil.',
-      assetKey: 'gagak'
+      assetKey: 'gagak',
+      slideImage: 'assets/slides/omnivora_5.jpg',
+      minimapImage: 'assets/minimaps/omnivora_minimap_5.jpg'
     }
   ];
 
@@ -380,6 +422,12 @@
   const narratives = {
     gameTitle: 'PETUALANGAN MINI ZOO',
     gameSubtitle: 'Game Edukasi Pengenalan Jenis Hewan Berdasarkan Makanan',
+    splashSlide: 'assets/slides/cover.jpg',
+    instructionsSlide: 'assets/slides/pembuka.jpg',
+    mainMapSlide: 'assets/slides/main_map.jpg',
+    preEndingSlide: 'assets/slides/pre_ending.jpg',
+    tamatSlide: 'assets/slides/tamat.jpg',
+    flowchartSlide: 'assets/slides/alur_permainan.jpg',
     opening: {
       title: 'Selamat datang di Petualangan Mini Zoo!',
       paragraphs: [

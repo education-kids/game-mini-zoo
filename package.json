@@ -5,7 +5,11 @@
   "main": "scripts/build_standalone.js",
   "scripts": {
     "test": "node tests/run_tests.js",
-    "build": "node scripts/build_standalone.js"
+    "build": "node scripts/build_standalone.js",
+    "build:www": "node scripts/prepare_www.js",
+    "android:init": "node scripts/prepare_www.js && cmd /c npx @capacitor/cli add android",
+    "android:sync": "node scripts/prepare_www.js && cmd /c npx @capacitor/cli sync android",
+    "android:open": "cmd /c npx @capacitor/cli open android"
   },
   "keywords": [
     "google-apps-script",
@@ -15,5 +19,13 @@
     "omnivora"
   ],
   "author": "Petualangan Mini Zoo Team",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0"
+  },
+  "dependencies": {
+    "@capacitor/app": "^8.1.2"
+  }
 }

@@ -1,0 +1,316 @@
+const fs = require('fs');
+
+const cleanHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Petualangan Mini Zoo - Game Edukasi Satwa 3D</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3BBC37">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <?!= include('Stylesheet'); ?>
+</head>
+<body>
+  <div class="game-viewport">
+    <div class="game-canvas-container slide-canvas-stage">
+
+      <!-- ================================================================= -->
+      <!-- TOP HUD: FLOATING MINIMAL HUD (CRYSTALS, SOUND, FULLSCREEN)       -->
+      <!-- ================================================================= -->
+      <header class="top-hud-container" id="game-hud" aria-label="HUD Permainan">
+        <div class="hud-left-section">
+          <button id="btn-back-to-gate" class="hud-back-btn btn-hotspot-pill" type="button" aria-label="Kembali" onclick="if(window.navigationRouter){window.navigationRouter.handleBackNav();}else if(window.handleBackNav){window.handleBackNav();}" style="display:none;">
+            <span>Kembali</span>
+          </button>
+          <div class="hud-crystals-bar" aria-label="Koleksi Kristal Ajaib">
+            <div id="slot-kristal-keberanian" class="hud-crystal-slot crystal-empty" title="Kristal Keberanian (Kerajaan Karnivora)" aria-label="Slot Kristal Keberanian"></div>
+            <div id="slot-kristal-kehidupan" class="hud-crystal-slot crystal-empty" title="Kristal Kehidupan (Kerajaan Herbivora)" aria-label="Slot Kristal Kehidupan"></div>
+            <div id="slot-kristal-harmoni" class="hud-crystal-slot crystal-empty" title="Kristal Harmoni (Kerajaan Omnivora)" aria-label="Slot Kristal Harmoni"></div>
+          </div>
+        </div>
+
+        <div class="hud-center-section">
+          <div id="quiz-top-info" class="hud-realm-badge-group" style="display:none;">
+            <span id="quiz-kingdom-badge" class="quiz-kingdom-badge">Kerajaan Karnivora</span>
+            <span id="quiz-level-indicator" class="quiz-level-indicator">Tantangan 1 dari 5</span>
+          </div>
+        </div>
+
+        <div class="hud-right-section floating-header-controls">
+          <button id="sound-toggle" class="btn-sound-toggle" type="button" aria-label="Pengaturan Suara" title="Pengaturan Suara">
+            <svg class="sound-wave" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+            <svg class="sound-slash" style="display:none;" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+          <button id="btn-fullscreen" class="btn-fullscreen-toggle" type="button" aria-label="Layar Penuh" title="Layar Penuh">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 1: SPLASH SCREEN (COVER SLIDE)                             -->
+      <!-- ================================================================= -->
+      <section id="screen-splash" class="game-screen screen active" aria-label="Sampul Pembuka">
+        <h1 class="visually-hidden">PETUALANGAN MINI ZOO</h1>
+        <div id="splash-hero-art" class="visually-hidden"></div>
+        <div id="splash-saved-info" class="splash-saved-info" style="display:none;"></div>
+
+        <!-- Tactile Hotspot Button: "Mulai Petualangan" -->
+        <div class="splash-cta-container">
+          <button id="btn-start-adventure" class="pro-game-cta-btn btn-3d-green hotspot-splash-start btn-centered slide-hotspot-pill" type="button" aria-label="Mulai Petualangan">
+            <span class="visually-hidden">Mulai Petualangan</span>
+          </button>
+          <div id="session-resume-box" class="session-resume-box" style="display:none;">
+            <button id="btn-resume-adventure" class="pro-game-cta-btn btn-3d-gold" type="button">
+              <span>Lanjutkan Petualangan</span>
+            </button>
+            <button id="btn-new-adventure" class="pro-game-cta-btn btn-3d-wood" type="button">
+              <span>Mulai dari Awal</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 2: INSTRUCTIONS SCREEN (PEMBUKA SLIDE)                     -->
+      <!-- ================================================================= -->
+      <section id="screen-instructions" class="game-screen screen" aria-label="Petunjuk Penjelajahan" style="display:none;">
+        <div class="visually-hidden">
+          <h2>Petunjuk Penjelajahan</h2>
+          <p>Tugasmu adalah menjelajahi Mini Zoo dan tiga kerajaan:</p>
+          <span>Kerajaan Karnivora</span>
+          <span>Kerajaan Herbivora</span>
+          <span>Kerajaan Omnivora</span>
+        </div>
+
+        <div class="instructions-footer">
+          <button id="btn-back-splash" class="pro-game-cta-btn btn-3d-wood btn-hotspot-back" type="button" aria-label="Kembali">
+            <span>Kembali</span>
+          </button>
+          <button id="btn-view-flowchart" class="pro-game-cta-btn btn-3d-wood btn-hotspot-flowchart" type="button" aria-label="Lihat Diagram Alur">
+            <span>Alur Game</span>
+          </button>
+          <button id="btn-start-mission" class="pro-game-cta-btn btn-3d-green hotspot-instructions-start btn-centered slide-hotspot-pill" type="button" aria-label="Ayo Mulai!">
+            <span class="visually-hidden">Ayo Mulai!</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 3: MAIN MAP SCREEN (HALAMAN AWAL SLIDE)                    -->
+      <!-- ================================================================= -->
+      <section id="screen-main-map" class="game-screen screen" aria-label="Peta 3 Kerajaan Satwa" style="display:none;">
+        <h2 class="visually-hidden">Peta Utama Tiga Kerajaan</h2>
+
+        <!-- Precision Castle Hotspots matching authentic slide artwork -->
+        <div id="card-kingdom-0" class="map-castle-hotspot card-karnivora card-unlocked" data-kingdom-index="0" role="button" tabindex="0" title="Kerajaan Karnivora (Terbuka)" aria-label="Masuk Kerajaan Karnivora">
+          <span class="castle-hotspot-badge">Kerajaan Karnivora</span>
+        </div>
+
+        <div id="card-kingdom-1" class="map-castle-hotspot card-herbivora card-locked" data-kingdom-index="1" role="button" tabindex="0" title="Kerajaan Herbivora" aria-label="Masuk Kerajaan Herbivora">
+          <span class="castle-hotspot-badge">Kerajaan Herbivora</span>
+        </div>
+
+        <div id="card-kingdom-2" class="map-castle-hotspot card-omnivora card-locked" data-kingdom-index="2" role="button" tabindex="0" title="Kerajaan Omnivora" aria-label="Masuk Kerajaan Omnivora">
+          <span class="castle-hotspot-badge">Kerajaan Omnivora</span>
+        </div>
+
+        <!-- Bottom-Right Quick Start Hotspot -->
+        <div style="position: absolute; right: 2.5%; bottom: 2.5%; width: 25%; height: 14%; z-index: 30;">
+          <button id="btn-map-quick-start" class="pro-game-cta-btn btn-3d-green hotspot-gate-start btn-centered slide-hotspot-pill" type="button" aria-label="Lanjutkan Tantangan">
+            <span class="visually-hidden">Lanjutkan Tantangan</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 4: KINGDOM GATE SCREEN (GERBANG SLIDE)                     -->
+      <!-- ================================================================= -->
+      <section id="screen-kingdom-gate" class="game-screen screen" aria-label="Gerbang Kerajaan" style="display:none;">
+        <div id="gate-castle-visual" class="visually-hidden"></div>
+        <div class="visually-hidden">
+          <h2 id="gate-title">Gerbang Kerajaan</h2>
+          <p id="gate-description">Selamat datang di gerbang kerajaan!</p>
+        </div>
+        <div id="gate-minimap" class="gate-minimap-container" style="display:none;"></div>
+
+        <div class="gate-footer">
+          <button id="btn-back-to-map" class="pro-game-cta-btn btn-3d-wood btn-hotspot-back" type="button" aria-label="Kembali ke Peta">
+            <span>Peta Dunia</span>
+          </button>
+          <button id="btn-gate-minimap" class="pro-game-cta-btn btn-3d-gold btn-hotspot-minimap-trigger" type="button" aria-label="Lihat Peta Jalur">
+            <span>Peta Jalur</span>
+          </button>
+          <button id="btn-start-challenge" class="pro-game-cta-btn btn-3d-green hotspot-gate-start btn-centered slide-hotspot-pill" type="button" aria-label="Masuk Kerajaan">
+            <span class="visually-hidden">Masuk Kerajaan</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 5: CHALLENGE SCREEN (TANTANGAN SATWA KUIS SLIDE)           -->
+      <!-- ================================================================= -->
+      <section id="screen-challenge" class="game-screen screen" aria-label="Tantangan Satwa" style="display:none;">
+        <!-- Left Side: Interactive Minimap Zoom Hotspot -->
+        <div id="quiz-minimap-hotspot" class="quiz-minimap-hotspot" title="Ketuk untuk Memperbesar Peta" aria-label="Perbesar Peta Mini">
+          <span class="minimap-hotspot-hint">Perbesar Peta</span>
+        </div>
+        <div id="quiz-minimap" class="minimap-wrapper" style="display:none;"></div>
+
+        <!-- Semantic content for controllers and tests -->
+        <div class="visually-hidden">
+          <div id="quiz-animal-visual"></div>
+          <h3 id="quiz-question">Siapakah aku?</h3>
+          <p id="quiz-clue">Petunjuk Satwa</p>
+        </div>
+
+        <div class="quiz-main-stage">
+          <!-- Right Side: Exact Hotspots over Options A, B, C -->
+          <div id="quiz-options-container" class="quiz-options-container"></div>
+
+          <!-- Bottom Right: Tactile Hotspot over "Jawab Sekarang!" Button -->
+          <button id="btn-quiz-submit" class="quiz-submit-hotspot slide-hotspot-pill" type="button" aria-label="Jawab Sekarang">
+            <span class="visually-hidden">Jawab Sekarang</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 6: KINGDOM REWARD SCREEN (ENDING KERAJAAN SLIDE)           -->
+      <!-- ================================================================= -->
+      <section id="screen-kingdom-reward" class="game-screen screen" aria-label="Hadiah Kristal Kerajaan" style="display:none;">
+        <div id="reward-crystal-visual" class="visually-hidden"></div>
+        <div class="visually-hidden">
+          <h2 id="reward-title">Kerajaan Selesai!</h2>
+          <div id="reward-crystal-name">Kristal Keberanian × 1</div>
+          <p id="reward-text">Luar biasa! Kamu telah menuntaskan seluruh tantangan.</p>
+        </div>
+        <div id="reward-minimap" class="minimap-wrapper" style="display:none;"></div>
+
+        <div class="reward-footer">
+          <button id="btn-reward-minimap" class="pro-game-cta-btn btn-3d-wood btn-hotspot-minimap-trigger" type="button" aria-label="Lihat Peta Tuntas">
+            <span>Peta Tuntas</span>
+          </button>
+          <button id="btn-reward-continue" class="pro-game-cta-btn btn-3d-gold hotspot-reward-continue btn-centered slide-hotspot-pill" type="button" aria-label="Lanjutkan Petualangan">
+            <span class="visually-hidden">Lanjutkan Petualangan</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 7: FINAL VICTORY SCREEN (PRE-ENDING & TAMAT SLIDES)        -->
+      <!-- ================================================================= -->
+      <section id="screen-final-victory" class="game-screen screen" aria-label="Kemenangan Akhir" style="display:none;">
+        <div id="victory-confetti" class="victory-confetti"></div>
+        <div class="visually-hidden">
+          <h1 id="victory-title">Kristal Persatuan Mini Zoo</h1>
+          <h2 id="victory-grand-title">PENJAGA PENGETAHUAN SATWA MINI ZOO!</h2>
+          <div id="victory-survivor-visual"></div>
+          <div id="victory-crystals-container"></div>
+        </div>
+
+        <div class="victory-footer">
+          <!-- Phase 1: Pre-Ending Hotspot -->
+          <button id="btn-victory-continue" class="pro-game-cta-btn btn-3d-gold slide-hotspot-pill" type="button" style="display:none;" aria-label="Lanjut ke Piagam Tamat">
+            <span>Lanjut ke Piagam Tamat</span>
+          </button>
+          <!-- Phase 2: Tamat Hotspots -->
+          <button id="btn-play-again" class="pro-game-cta-btn btn-3d-gold slide-hotspot-pill" type="button" aria-label="Main Lagi">
+            <span>Main Lagi</span>
+          </button>
+          <button id="btn-finish-game" class="pro-game-cta-btn btn-3d-green slide-hotspot-pill" type="button" aria-label="Peta Utama">
+            <span>Peta Utama</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- EDUCATIONAL FEEDBACK MODAL DIALOG                                 -->
+      <!-- ================================================================= -->
+      <div id="feedback-modal" class="feedback-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+        <div class="feedback-modal-content">
+          <h3 id="feedback-title" class="feedback-title">Hebat! Jawaban Benar!</h3>
+          <div id="feedback-text" class="feedback-text">Pengetahuan Satwa</div>
+          <div id="feedback-animal-info" class="feedback-animal-info"></div>
+          <div class="feedback-actions">
+            <button id="btn-feedback-retry" class="pro-game-cta-btn btn-3d-wood" type="button" style="display:none;">
+              <span>Coba Lagi</span>
+            </button>
+            <button id="btn-feedback-continue" class="pro-game-cta-btn btn-3d-green" type="button">
+              <span>Lanjutkan</span>
+            </button>
+            <button id="btn-feedback-close" class="pro-game-cta-btn btn-3d-wood" type="button" style="display:none;">
+              <span>Tutup</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- AUTHENTIC MINIMAP VIEWER MODAL                                    -->
+      <!-- ================================================================= -->
+      <div id="modal-minimap-viewer" class="game-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Peta Jalur Kerajaan">
+        <div class="minimap-modal-card">
+          <div class="minimap-modal-header">
+            <h3 id="minimap-modal-title" class="minimap-modal-title">Peta Jalur Kerajaan</h3>
+            <button id="btn-close-minimap" class="btn-modal-close" type="button" aria-label="Tutup Peta">&times;</button>
+          </div>
+          <div class="minimap-modal-body">
+            <img id="minimap-modal-img" class="minimap-modal-view-img" src="assets/minimaps/karnivora_minimap_1.jpg" alt="Peta Jalur Kerajaan" />
+          </div>
+          <div class="minimap-modal-footer">
+            <span class="minimap-modal-hint">Amati perjalananmu melintasi lima pos pemeriksaan satwa!</span>
+            <button id="btn-minimap-dismiss" class="pro-game-cta-btn btn-3d-gold btn-minimap-dismiss" type="button">
+              <span>Kembali</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- ALUR PERMAINAN FLOWCHART MODAL                                    -->
+      <!-- ================================================================= -->
+      <div id="modal-flowchart-viewer" class="game-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Diagram Alur Permainan">
+        <div class="minimap-modal-card flowchart-modal-card">
+          <div class="minimap-modal-header">
+            <h3 class="minimap-modal-title">Diagram Alur Permainan Mini Zoo</h3>
+            <button id="btn-close-flowchart" class="btn-modal-close" type="button" aria-label="Tutup Diagram">&times;</button>
+          </div>
+          <div class="minimap-modal-body">
+            <img class="minimap-modal-view-img" src="assets/slides/alur_permainan.jpg" alt="Diagram Alur Permainan" />
+          </div>
+          <div class="minimap-modal-footer">
+            <button id="btn-flowchart-dismiss" class="pro-game-cta-btn btn-3d-gold btn-minimap-dismiss" type="button">
+              <span>Tutup Diagram</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <?!= include('GameData'); ?>
+  <?!= include('JavaScript'); ?>
+</body>
+</html>
+`;
+
+fs.writeFileSync('src/Index.html', cleanHtml, 'utf8');
+console.log('Clean pure-hyperlink Index.html created successfully!');

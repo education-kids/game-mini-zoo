@@ -672,7 +672,7 @@ function runE2ETests(runner) {
       assert.strictEqual(app.engine.getCheckpointStatus(2), 'locked', 'Checkpoint 2 remains locked');
 
       // UI Challenge screen reflects Level 2 (Harimau)
-      assert.ok(app.elements['quiz-clue'].textContent.includes('belang hitam dan oranye'), 'Clue must update to Harimau');
+      assert.ok(app.elements['quiz-clue'].textContent.includes('belang hitam'), 'Clue must update to Harimau');
       assert.ok(app.elements['quiz-level-indicator'].textContent.includes('2 dari 5'));
     });
   });
@@ -690,8 +690,8 @@ function runE2ETests(runner) {
       optB.click();
       app.elements['btn-feedback-continue'].click(); // to level 2 (Harimau)
 
-      const optA = app.elements['quiz-options-container'].querySelector('[data-option-key="A"]');
-      optA.click();
+      const optHarimau = app.elements['quiz-options-container'].querySelector('[data-option-key="B"]');
+      optHarimau.click();
       app.elements['btn-feedback-continue'].click(); // to level 3 (Buaya)
 
       assert.strictEqual(app.engine.currentLevelIndex, 2);
@@ -731,7 +731,7 @@ function runE2ETests(runner) {
       app.elements['btn-resume-adventure'].click();
       assert.strictEqual(app.router.getCurrentScreen(), 'screen-challenge');
       assert.strictEqual(app.engine.currentLevelIndex, 1);
-      assert.ok(app.elements['quiz-clue'].textContent.includes('belang hitam dan oranye'));
+      assert.ok(app.elements['quiz-clue'].textContent.includes('belang hitam'));
     });
 
     it('new adventure button resets progress and starts fresh from instructions', () => {
@@ -768,7 +768,7 @@ function runE2ETests(runner) {
       app.elements['card-kingdom-0'].click();
       app.elements['btn-start-challenge'].click();
 
-      const k1Answers = ['B', 'A', 'B', 'C', 'B'];
+      const k1Answers = ['B', 'B', 'B', 'B', 'B'];
       for (let i = 0; i < 5; i++) {
         assert.strictEqual(app.router.getCurrentScreen(), 'screen-challenge');
         assert.strictEqual(app.engine.currentLevelIndex, i);
@@ -847,7 +847,7 @@ function runE2ETests(runner) {
       assert.ok(app.elements['gate-title'].textContent.includes('Omnivora'));
       app.elements['btn-start-challenge'].click();
 
-      const k3Answers = ['A', 'B', 'C', 'A', 'B'];
+      const k3Answers = ['A', 'A', 'B', 'A', 'B'];
       // Play levels 11 to 14
       for (let i = 0; i < 4; i++) {
         assert.strictEqual(app.router.getCurrentScreen(), 'screen-challenge');

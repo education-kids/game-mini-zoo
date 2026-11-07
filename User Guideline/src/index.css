@@ -1,0 +1,217 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Poppins:Bold Italic";
+  src: url("https://static.figma.com/font/Poppins-BoldItalic_4") format("woff2");
+  font-style: italic;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Poppins:Bold";
+  src: url("https://static.figma.com/font/Poppins-Bold_6") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Poppins:Medium Italic";
+  src: url("https://static.figma.com/font/Poppins-MediumItalic_4") format("woff2");
+  font-style: italic;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Poppins:Medium";
+  src: url("https://static.figma.com/font/Poppins-Medium_6") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Poppins:Regular";
+  src: url("https://static.figma.com/font/Poppins-Regular_6") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Poppins:SemiBold";
+  src: url("https://static.figma.com/font/Poppins-SemiBold_6") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: #fff;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  button:focus-visible {
+    outline: 3px solid #107afd;
+    outline-offset: 3px;
+  }
+}
+
+.guideline-page {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: white;
+}
+
+.artboard-shell {
+  position: relative;
+  margin-inline: auto;
+}
+
+.artboard-scale {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 1500px;
+  height: 17578px;
+  transform-origin: top left;
+}
+
+.artboard {
+  width: 1500px;
+  height: 17578px;
+  overflow: hidden;
+}
+
+.section-nav {
+  position: fixed;
+  z-index: 100;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  font-family: "Poppins:Medium", sans-serif;
+  color: #565656;
+}
+
+.section-nav__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 10px 17px;
+  border: 2px solid rgb(255 255 255 / 90%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 5px 18px rgb(0 71 140 / 18%);
+  color: #107afd;
+  font-family: "Poppins:Bold", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.section-nav__dots {
+  display: grid;
+  grid-template-columns: repeat(3, 4px);
+  gap: 3px;
+}
+
+.section-nav__dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.section-nav__panel {
+  display: grid;
+  width: min(286px, calc(100vw - 36px));
+  max-height: calc(100dvh - 84px);
+  margin-top: 10px;
+  padding: 18px;
+  overflow-y: auto;
+  border: 2px solid rgb(255 255 255 / 90%);
+  border-radius: 24px;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 12px 35px rgb(0 71 140 / 20%);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top right;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    visibility 160ms;
+  backdrop-filter: blur(16px);
+}
+
+.section-nav.is-open .section-nav__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.section-nav__panel > p {
+  margin: 0 0 10px 8px;
+  font-family: "Poppins:Bold", sans-serif;
+  font-size: 13px;
+  color: #565656;
+}
+
+.section-nav__panel button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 8px;
+  border-radius: 12px;
+  color: #565656;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    transform 120ms ease;
+}
+
+.section-nav__panel button:hover {
+  background: #eef7ff;
+  transform: translateX(2px);
+}
+
+.section-nav__panel button span {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+}
+
+@media (max-width: 640px) {
+  .section-nav {
+    top: 10px;
+    right: 10px;
+  }
+
+  .section-nav__toggle {
+    min-height: 40px;
+    padding: 8px 13px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .section-nav__panel,
+  .section-nav__panel button {
+    transition: none;
+  }
+}

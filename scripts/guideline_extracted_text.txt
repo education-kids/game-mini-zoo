@@ -1,0 +1,92 @@
+DESAIN RANCANGAN UI KIT MODULAR
+{`UNTUK GAME EDUKASI ANAK `}
+Tentang
+Dokumentasi ini merupakan panduan penggunaan UI Kit Modular untuk pengembangan antarmuka game edukasi anak. Panduan ini bertujuan untuk memastikan konsistensi visual dan fungsionalitas komponen, baik pada tahap desain di Figma maupun saat diimplementasikan ke dalam game engine (Unity).
+Palet Warna
+Bubble Button
+#F8B13F
+#20B2E0
+#2A98E2
+#B1E21D
+#3BBC37
+#FD7B95
+#FB5252
+Flat Button
+#F69021
+#70C05A
+#4994D1
+#F05E93
+#FAD902
+#C4C4C4
+Daftar isi
+Filosofi Desain
+Kondisi Tombol
+Panduan Warna
+Panduan Font
+Aturan Penggunaan
+Ikon
+{`Penggunaan di Figma & Unity`}
+Enable
+Hover/Pressed
+Disable
+Enabled
+Enabled:
+{` Kondisi normal saat tombol siap untuk ditekan. Menggunakan warna dasar yang cerah dan saturasi tinggi untuk menarik perhatian pemain.`}
+{`Hover/Pressed: `}
+{`Kondisi saat kursor berada di atas tombol, atau saat tombol sedang ditekan. Menggunakan turunan warna yang lebih gelap (darker shade) dari warna dasar. Pada Bubble Button, state ini memberikan ilusi bahwa tombol sedang "ditekan masuk" ke dalam.`}
+{`Disabled: `}
+Kondisi saat aksi atau fitur pada tombol tidak tersedia/terkunci. Selalu direpresentasikan dengan warna Abu-abu (Grey). Tombol tidak akan merespon interaksi dari pemain.
+{`Gaya 3D (highlight & shadow) yang playful dan meniru objek fisik. Memberikan affordance yang kuat. Cocok untuk gameplay utama.`}
+Gaya minimalis, clean, dan modern. Cocok untuk menu sekunder, settings, atau UI yang lebih padat.
+Penggunaan warna pada UI Kit ini tidak sekadar untuk estetika, tetapi memiliki arti fungsional (semantik) untuk membimbing pemain anak-anak dalam mengambil keputusan:
+Aksi Positif / Melanjutkan.
+Gunakan untuk tombol Play, Yes, Confirm, Submit, atau Next.
+Aksi Netral / Navigasi.
+Gunakan untuk membuka menu, Settings, Profile, Home, Store, atau Pause.
+Aksi Negatif / Berhenti.
+Gunakan untuk tombol Close, Cancel, No, Stop, atau Quit.
+Status Nonaktif.
+Eksklusif hanya untuk tombol dengan state Disabled.
+Tidak ada ketentuan font khusus terkait penggunaan font, namun penulis menyarankan untuk menggunakan font “Anja Eliane”. Font ini dipilih karena bentuknya yang rounded dan tebal, sangat mudah dibaca oleh anak-anak dan selaras dengan estetika game edukasi.
+*Font ini bisa untuk Headline, bisa juga untuk body
+AaBbCc01234
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+1234567890
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Anja Eliane Typeface
+Normal
+Agar tampilan tetap rapi, konsisten, dan mudah dipahami pengguna, perhatikan beberapa hal yang sebaiknya dilakukan berikut ini:
+Gunakan warna sesuai dengan panduan semantik warna untuk mempercepat pemahaman pengguna.
+{` `}
+/ Lakukan
+Pertahankan area kosong (safe area / padding) antara ikon dan batas tombol agar tombol tetap proporsional.
+Safe zone
+JANGAN
+{` Mengubah warna Button selain dari warna yang sudah disediakan.`}
+Don’t
+/ Jangan Lakukan
+{` Menggunakan Bubble Button berukuran sangat kecil, karena efek 3D nya akan terlihat menumpuk dan mengurangi kejelasan ikon.`}
+{`JANGAN `}
+Mengubah proporsi tombol secara manual yang dapat merusak kelengkungan sudut (rounded corners).
+Konsisten menggunakan satu style (Bubble atau Flat) dalam satu tampilan layar (screen) yang sama agar visual tidak bentrok.
+Koleksi ikon yang tersedia dalam UI Kit ini dirancang berdasarkan standarisasi kebutuhan game edukasi:
+Research-Based:
+{` Ikon-ikon ini dikumpulkan dari hasil analisis berbagai jenis game edukasi anak untuk mencakup kebutuhan fungsi yang paling umum.`}
+General Reference:
+{` Aset ikon yang disajikan berfungsi sebagai gambaran umum dan referensi standar bagi pengembang.`}
+Flexibility:
+Bentuk dan detail ikon bersifat fleksibel; pengguna diperbolehkan untuk memodifikasi atau mengubah bentuk ikon sesuai dengan kebutuhan spesifik tema permainan masing-masing.
+Consistency:
+{` Pastikan ikon tetap menggunakan gaya Solid/Filled agar tetap kontras saat diletakkan di atas tombol.`}
+Contoh Implementasi Button
+Main Menu
+Choosing Topic
+Choosing Level
+Gameplay
+Result
+Penutup
+Dengan mengikuti panduan ini, penggunaan UI Kit Modular diharapkan dapat menghasilkan antarmuka game edukasi anak yang konsisten, menarik, mudah dipahami, dan sesuai dengan kebutuhan interaksi pengguna anak. Panduan ini juga dapat menjadi acuan bagi desainer maupun developer dalam mengembangkan antarmuka game secara lebih efisien.
+Jelajahi panduan
+{section.label}
+))}

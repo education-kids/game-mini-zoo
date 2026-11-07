@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Android & Gradle Build Artifacts
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+
+# Local OS & Editor files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Temp test & extraction files
+test_*.html
+test_*.jpg
+test_*.png
+gdrive_raw.html
+gdrive_*.json
+*.docx
+*.zip
+
+# Superpowers agent metadata
+.superpowers/
