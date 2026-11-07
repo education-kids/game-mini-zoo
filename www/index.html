@@ -2377,7 +2377,7 @@ header[style*="display:none"] {
   background: rgba(250, 204, 21, 0.12) !important;
   border-color: rgba(250, 204, 21, 0.5) !important;
   box-shadow: 0 0 16px rgba(250, 204, 21, 0.35) !important;
-  transform: scale(1.01) !important;
+  transform: none !important;
 }
 
 .btn-quiz-option.active,
@@ -2385,13 +2385,14 @@ header[style*="display:none"] {
   border-color: #F59E0B !important;
   background: rgba(245, 158, 11, 0.22) !important;
   box-shadow: 0 0 18px rgba(245, 158, 11, 0.75), inset 0 0 8px rgba(245, 158, 11, 0.25) !important;
-  transform: scale(1.008) !important;
+  transform: none !important;
 }
 
 .btn-quiz-option.correct {
   border-color: #10B981 !important;
   background: rgba(16, 185, 129, 0.25) !important;
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(16, 185, 129, 0.3) !important;
+  transform: none !important;
 }
 
 .btn-quiz-option.wrong {
@@ -2399,6 +2400,7 @@ header[style*="display:none"] {
   background: rgba(239, 68, 68, 0.25) !important;
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(239, 68, 68, 0.3) !important;
   animation: shakeWrong 0.35s ease-in-out !important;
+  transform: none !important;
 }
 
 @keyframes shakeWrong {
@@ -2461,32 +2463,41 @@ header[style*="display:none"] {
 /* Jawab Sekarang Button Hotspot */
 .quiz-submit-hotspot {
   position: absolute !important;
-  left: 67.4% !important;
-  width: 29.6% !important;
-  top: 85.8% !important;
-  height: 6.6% !important;
+  left: 67.2% !important;
+  width: 29.8% !important;
+  top: 84.4% !important;
+  height: 10.8% !important;
   border-radius: 9999px !important;
   cursor: pointer !important;
   pointer-events: auto !important;
   background: transparent !important;
-  border: 3.5px solid transparent !important;
+  border: none !important;
   box-shadow: none !important;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: background 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease !important;
   z-index: 40 !important;
   outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
   touch-action: manipulation !important;
+  transform: none !important;
 }
 
-.quiz-submit-hotspot:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(254, 240, 138, 0.7) !important;
-  box-shadow: 0 0 20px rgba(254, 240, 138, 0.5) !important;
-  transform: scale(1.015) !important;
+.quiz-submit-hotspot:hover,
+.quiz-submit-hotspot:focus-visible {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: none !important;
+  box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.35) !important;
+  outline: none !important;
+  transform: none !important;
 }
 
 .quiz-submit-hotspot:active {
-  transform: scale(0.97) !important;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4) !important;
+  background: rgba(0, 0, 0, 0.14) !important;
+  filter: brightness(0.92) !important;
+  border: none !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  outline: none !important;
+  transform: none !important;
 }
 
 /* ==========================================================================
@@ -2585,15 +2596,19 @@ header[style*="display:none"] {
 }
 
 #screen-kingdom-reward #btn-reward-continue:hover,
-#btn-reward-continue.slide-hotspot-pill:hover {
+#btn-reward-continue.slide-hotspot-pill:hover,
+#screen-kingdom-reward #btn-reward-continue:focus-visible,
+#btn-reward-continue.slide-hotspot-pill:focus-visible {
   background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
-  transform: scale(1.02) !important;
+  box-shadow: inset 0 0 20px rgba(34, 197, 94, 0.6) !important;
+  transform: none !important;
 }
 
 #screen-kingdom-reward #btn-reward-continue:active,
 #btn-reward-continue.slide-hotspot-pill:active {
-  transform: scale(0.97) translateY(2px) !important;
+  background: rgba(0, 0, 0, 0.15) !important;
+  filter: brightness(0.92) !important;
+  transform: none !important;
 }
 
 #btn-reward-minimap {
